@@ -151,8 +151,9 @@ export async function createApp({
           password.length > 128
         )
           fail(400, "Credenciales inválidas");
-        rateLimit("ip:" + ip);
-        rateLimit("email:" + email);
+        const prefix = path === "/api/login" ? "login:" : "register:";
+        const attemptKeys = [prefix + "ip:" + ip, prefix + "email:" + email];
+        for (const key of attemptKeys) rateLimit(key);
         if (path === "/api/register") {
           if (
             typeof body.name !== "string" ||
@@ -219,6 +220,10 @@ export async function createApp({
             csrf,
             Date.now() + 8 * 3600000,
           );
+          // Successful authentication does not consume the failed-attempt budget.
+          // Preserve failures from other requests, including concurrent ones.
+          for (const key of attemptKeys)
+            db.prepare("UPDATE attempts SET count=MAX(0,count-1) WHERE key=?").run(key);
           audit(candidate.id, "login.succeeded", candidate.id, ip);
         });
         res.setHeader(

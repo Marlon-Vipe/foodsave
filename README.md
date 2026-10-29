@@ -55,7 +55,7 @@ Los identificadores siguientes se asignaron a partir de la épica recibida; no s
 npm test
 ```
 
-Resultado de la entrega: **24 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
+Resultado de la entrega: **27 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
 
 Para reproducir las verificaciones de navegador, con la aplicación de demostración ejecutándose y cuentas recién creadas:
 
@@ -67,7 +67,7 @@ npm run test:browser
 
 Playwright se usa únicamente como herramienta de desarrollo. El script comprueba registro, inicio/cierre de sesión, asignación de roles, edición de permisos, creación y consumo de alimentos, reportes, controles restringidos al lector y el rechazo 403 por API. Genera capturas y un video en `docs/evidence`. La comprobación de desbordamiento del login usa anchos de 390, 768 y 1440 px. Consulta el [informe del navegador](docs/evidence/browser-results.json).
 
-El límite de autenticación es ocho solicitudes de login/registro por IP y correo en 15 minutos. Para repetir la demostración automatizada muchas veces, utiliza una base de pruebas nueva con `DATABASE_PATH` y vuelve a ejecutar `npm run demo`; no desactives este control en un entorno real.
+El inicio de sesión admite ocho intentos fallidos por IP y correo en 15 minutos. Los accesos correctos no consumen ese presupuesto ni borran los fallos anteriores. El registro conserva un límite independiente de ocho solicitudes por IP y correo en 15 minutos, para controlar la creación masiva de cuentas. Las demostraciones pueden iniciar y cerrar sesión repetidamente sin agotar el límite de fallos.
 
 - [Login móvil](docs/evidence/01-login-mobile.png)
 - [Administración de usuarios](docs/evidence/02-users-admin.png)

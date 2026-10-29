@@ -2,35 +2,38 @@
 > foodsave-access@1.0.0 test
 > node --test
 
-✔ HU-01 Registro persiste lector, normaliza correo y nunca expone hash (108.365667ms)
-✔ HU-01 Rechaza contraseñas cortas, nombre vacío y correo inválido (35.895708ms)
-✔ HU-01 Rechaza correos duplicados sin crear otra cuenta (92.467959ms)
-✔ HU-02 Login correcto, sesión persistida como hash y perfil disponible (90.148ms)
-✔ HU-02 Credenciales incorrectas no autentican y quedan auditadas (88.571458ms)
-✔ HU-02 Limita intentos repetidos (258.6065ms)
-✔ HU-03 Logout revoca la sesión y el token antiguo recibe 401 (87.097208ms)
-✔ HU-04 Administrador lista usuarios sin hashes (86.190458ms)
-✔ HU-04 Cambio de rol revoca sesiones y aplica nuevos permisos (178.598416ms)
-✔ HU-04 Desactivación bloquea sesión y login; reactivación permite entrar (209.374625ms)
-✔ HU-04 Impide retirar el acceso del propio administrador (92.023958ms)
-✔ HU-05 Modifica permisos y revoca sesiones del perfil (180.358959ms)
-✔ HU-05 Protege permisos administrativos y valida códigos (92.031375ms)
-✔ HU-06 Matriz de accesos por perfil se valida en servidor (278.752458ms)
-✔ HU-06 Anónimo no accede a ningún módulo protegido (32.92025ms)
-✔ HU-06 Lector no puede modificar usuarios ni permisos (93.534917ms)
-✔ HU-07 Auditoría guarda actor, acción, objetivo y fecha (90.408042ms)
-✔ Seguridad: CSRF y origen externo rechazados (91.770833ms)
-✔ Seguridad: sesión expirada rechazada (88.472625ms)
-✔ Seguridad: parámetros SQL no permiten saltar autenticación (59.723292ms)
-✔ HU-06 Inventario: lector consulta; editor crea y procesa alimentos; supervisor ve reportes (212.222875ms)
-✔ Inventario rechaza fechas inexistentes, cantidades y categorías inválidas (90.544ms)
-✔ Cookie HttpOnly y SameSite, recursos locales y cabeceras de seguridad (91.759459ms)
-✔ Datos de usuario malformados reciben 400 y no afectan permisos (119.666292ms)
-ℹ tests 24
+✔ HU-01 Registro persiste lector, normaliza correo y nunca expone hash (110.617542ms)
+✔ HU-01 Rechaza contraseñas cortas, nombre vacío y correo inválido (36.412917ms)
+✔ HU-01 Rechaza correos duplicados sin crear otra cuenta (93.315833ms)
+✔ HU-02 Login correcto, sesión persistida como hash y perfil disponible (94.975375ms)
+✔ HU-02 Credenciales incorrectas no autentican y quedan auditadas (90.63525ms)
+✔ HU-02 Limita intentos repetidos (272.489792ms)
+✔ HU-03 Logout revoca la sesión y el token antiguo recibe 401 (93.041958ms)
+✔ HU-04 Administrador lista usuarios sin hashes (94.371583ms)
+✔ HU-04 Cambio de rol revoca sesiones y aplica nuevos permisos (190.117416ms)
+✔ HU-04 Desactivación bloquea sesión y login; reactivación permite entrar (212.376459ms)
+✔ HU-04 Impide retirar el acceso del propio administrador (92.436958ms)
+✔ HU-05 Modifica permisos y revoca sesiones del perfil (178.0505ms)
+✔ HU-05 Protege permisos administrativos y valida códigos (89.041709ms)
+✔ HU-06 Matriz de accesos por perfil se valida en servidor (276.722708ms)
+✔ HU-06 Anónimo no accede a ningún módulo protegido (31.566791ms)
+✔ HU-06 Lector no puede modificar usuarios ni permisos (92.09625ms)
+✔ HU-07 Auditoría guarda actor, acción, objetivo y fecha (90.154208ms)
+✔ Seguridad: CSRF y origen externo rechazados (89.601958ms)
+✔ Seguridad: sesión expirada rechazada (92.075042ms)
+✔ Seguridad: parámetros SQL no permiten saltar autenticación (59.29025ms)
+✔ HU-06 Inventario: lector consulta; editor crea y procesa alimentos; supervisor ve reportes (205.770708ms)
+✔ Inventario rechaza fechas inexistentes, cantidades y categorías inválidas (92.493ms)
+✔ Cookie HttpOnly y SameSite, recursos locales y cabeceras de seguridad (92.947666ms)
+✔ Datos de usuario malformados reciben 400 y no afectan permisos (120.062958ms)
+✔ Regresión: veinte logins correctos no bloquean el entorno compartido (630.919084ms)
+✔ Regresión: un login correcto no borra fallos previos y el noveno intento se bloquea (316.99675ms)
+✔ Regresión: el límite de registro no bloquea el inicio de sesión (332.156ms)
+ℹ tests 27
 ℹ suites 0
-ℹ pass 24
+ℹ pass 27
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 2916.089084
+ℹ duration_ms 4240.10525

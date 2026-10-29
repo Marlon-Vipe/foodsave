@@ -500,3 +500,25 @@ test("Datos de usuario malformados reciben 400 y no afectan permisos", async (t)
     "lector",
   );
 });
+
+test('Regresión: veinte logins correctos no bloquean el entorno compartido', async t => {
+  const a = await setup(t), u = await a.account('administrador');
+  for (let i=0; i<20; i++) {
+    const r = await a.request('login', {method:'POST', body:{email:u.email,password}});
+    assert.equal(r.status,200);
+  }
+  assert.ok(a.db.prepare('SELECT count FROM attempts').all().every(r=>r.count===0));
+});
+test('Regresión: un login correcto no borra fallos previos y el noveno intento se bloquea', async t => {
+  const a = await setup(t), u = await a.account();
+  for (let i=0; i<7; i++) assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password:'incorrecta'}})).status,401);
+  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password}})).status,200);
+  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password:'incorrecta'}})).status,401);
+  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password}})).status,429);
+});
+test('Regresión: el límite de registro no bloquea el inicio de sesión', async t => {
+  const a = await setup(t), u = await a.account('administrador');
+  for(let i=0; i<8; i++) await a.request('register',{method:'POST',body:{name:'Nuevo usuario',email:'new'+i+'@example.test',password}});
+  assert.equal((await a.request('register',{method:'POST',body:{name:'Otro usuario',email:'other@example.test',password}})).status,429);
+  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password}})).status,200);
+});

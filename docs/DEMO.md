@@ -7,7 +7,7 @@ Compromiso solicitado: **29 de octubre de 2026 a las 20:00, America/Santo_Doming
 1. Usa Node.js 24 o posterior. Ejecuta `npm run demo` y `npm start` en la raíz del repositorio.
 2. Abre http://localhost:3000. Las cuatro cuentas y sus contraseñas aleatorias están en el archivo local `.demo-credentials.json` (no se publica en Git).
 3. Ten abierta una segunda ventana privada para probar otro perfil simultáneamente.
-4. Ejecuta `npm test` para mostrar el resultado reproducible de las 24 pruebas.
+4. Ejecuta `npm test` para mostrar el resultado reproducible de las 27 pruebas.
 
 ## Exposición sugerida: 6–8 minutos
 
