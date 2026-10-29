@@ -1,0 +1,29 @@
+name: FoodSave access checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - name: Prepare local demo
+        run: npm run demo > /tmp/foodsave-demo.log
+      - name: Start application
+        run: |
+          npm start > /tmp/foodsave-server.log 2>&1 &
+          node -e "(async()=>{for(let i=0;i<40;i++){try{const r=await fetch('http://localhost:3000');if(r.ok)return}catch{}await new Promise(r=>setTimeout(r,250))}process.exit(1)})()"
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foodsave-browser-evidence
+          path: docs/evidence/

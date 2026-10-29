@@ -1,0 +1,30 @@
+{
+  "result": "passed",
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "checks": [
+    "login",
+    "logout",
+    "registro",
+    "administración de usuarios",
+    "asignación de rol desde interfaz",
+    "edición de permisos desde interfaz",
+    "auditoría",
+    "creación y consumo de alimento desde interfaz",
+    "reportes",
+    "controles ocultos al lector",
+    "API 403 al lector",
+    "sin errores JavaScript",
+    "sin desbordamiento horizontal"
+  ],
+  "denied": {
+    "status": 403,
+    "body": {
+      "error": "No tienes permiso para esta funcionalidad"
+    }
+  },
+  "errors": []
+}
