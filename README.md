@@ -55,7 +55,7 @@ Los identificadores siguientes se asignaron a partir de la épica recibida; no s
 npm test
 ```
 
-Resultado de la entrega: **24 pruebas HTTP aprobadas**. [Salida de pruebas](test-results.txt).
+Resultado de la entrega: **24 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
 
 Para reproducir las verificaciones de navegador, con la aplicación de demostración ejecutándose y cuentas recién creadas:
 
