@@ -501,24 +501,180 @@ test("Datos de usuario malformados reciben 400 y no afectan permisos", async (t)
   );
 });
 
-test('Regresión: veinte logins correctos no bloquean el entorno compartido', async t => {
-  const a = await setup(t), u = await a.account('administrador');
-  for (let i=0; i<20; i++) {
-    const r = await a.request('login', {method:'POST', body:{email:u.email,password}});
-    assert.equal(r.status,200);
+test("Regresión: veinte logins correctos no bloquean el entorno compartido", async (t) => {
+  const a = await setup(t),
+    u = await a.account("administrador");
+  for (let i = 0; i < 20; i++) {
+    const r = await a.request("login", {
+      method: "POST",
+      body: { email: u.email, password },
+    });
+    assert.equal(r.status, 200);
   }
-  assert.ok(a.db.prepare('SELECT count FROM attempts').all().every(r=>r.count===0));
+  assert.ok(
+    a.db
+      .prepare("SELECT count FROM attempts")
+      .all()
+      .every((r) => r.count === 0),
+  );
 });
-test('Regresión: un login correcto no borra fallos previos y el noveno intento se bloquea', async t => {
-  const a = await setup(t), u = await a.account();
-  for (let i=0; i<7; i++) assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password:'incorrecta'}})).status,401);
-  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password}})).status,200);
-  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password:'incorrecta'}})).status,401);
-  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password}})).status,429);
+test("Regresión: un login correcto no borra fallos previos y el noveno intento se bloquea", async (t) => {
+  const a = await setup(t),
+    u = await a.account();
+  for (let i = 0; i < 7; i++)
+    assert.equal(
+      (
+        await a.request("login", {
+          method: "POST",
+          body: { email: u.email, password: "incorrecta" },
+        })
+      ).status,
+      401,
+    );
+  assert.equal(
+    (
+      await a.request("login", {
+        method: "POST",
+        body: { email: u.email, password },
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (
+      await a.request("login", {
+        method: "POST",
+        body: { email: u.email, password: "incorrecta" },
+      })
+    ).status,
+    401,
+  );
+  assert.equal(
+    (
+      await a.request("login", {
+        method: "POST",
+        body: { email: u.email, password },
+      })
+    ).status,
+    429,
+  );
 });
-test('Regresión: el límite de registro no bloquea el inicio de sesión', async t => {
-  const a = await setup(t), u = await a.account('administrador');
-  for(let i=0; i<8; i++) await a.request('register',{method:'POST',body:{name:'Nuevo usuario',email:'new'+i+'@example.test',password}});
-  assert.equal((await a.request('register',{method:'POST',body:{name:'Otro usuario',email:'other@example.test',password}})).status,429);
-  assert.equal((await a.request('login',{method:'POST',body:{email:u.email,password}})).status,200);
+test("Regresión: el límite de registro no bloquea el inicio de sesión", async (t) => {
+  const a = await setup(t),
+    u = await a.account("administrador");
+  for (let i = 0; i < 8; i++)
+    await a.request("register", {
+      method: "POST",
+      body: {
+        name: "Nuevo usuario",
+        email: "new" + i + "@example.test",
+        password,
+      },
+    });
+  assert.equal(
+    (
+      await a.request("register", {
+        method: "POST",
+        body: { name: "Otro usuario", email: "other@example.test", password },
+      })
+    ).status,
+    429,
+  );
+  assert.equal(
+    (
+      await a.request("login", {
+        method: "POST",
+        body: { email: u.email, password },
+      })
+    ).status,
+    200,
+  );
+});
+
+test("Reportes: exportación y vista imprimible rechazan anónimos y perfiles sin permiso", async (t) => {
+  const a = await setup(t),
+    s = await a.login(await a.account("lector"));
+  for (const route of ["reports/export.csv", "reports/print"]) {
+    assert.equal((await a.request(route)).status, 401);
+    assert.equal((await a.request(route, s)).status, 403);
+  }
+});
+test("Reportes: CSV incluye inventario e historial completos, resumen y auditoría", async (t) => {
+  const a = await setup(t),
+    u = await a.account("supervisor"),
+    s = await a.login(u);
+  const insert = a.db.prepare(
+    "INSERT INTO foods(name,category,quantity,expires,status,created_by) VALUES (?,?,?,?,?,?)",
+  );
+  for (let i = 0; i < 105; i++)
+    insert.run(
+      "Alimento " + i,
+      "Otros",
+      2,
+      "2026-12-01",
+      i === 0 ? "available" : i === 1 ? "wasted" : "consumed",
+      u.id,
+    );
+  const r = await fetch(
+    `http://127.0.0.1:${a.server.address().port}/api/reports/export.csv`,
+    { headers: { Cookie: s.cookie } },
+  );
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get("content-type"), /text\/csv/);
+  assert.match(
+    r.headers.get("content-disposition"),
+    /attachment; filename="foodsave-reporte-/,
+  );
+  const bytes = Buffer.from(await r.arrayBuffer());
+  assert.equal(bytes.subarray(0, 3).toString("hex"), "efbbbf");
+  const csv = bytes.toString("utf8");
+  assert.ok(csv.includes('"Total de alimentos","105"'));
+  assert.ok(csv.includes("Alimento 104"));
+  assert.ok(csv.includes('"Aprovechados","103"'));
+  assert.ok(csv.includes('"Descartados","1"'));
+  assert.equal(
+    a.db
+      .prepare("SELECT count(*) n FROM audit WHERE action='report.generated'")
+      .get().n,
+    1,
+  );
+});
+test("Reportes: neutraliza fórmulas CSV y escapa HTML de datos ingresados", async (t) => {
+  const a = await setup(t),
+    u = await a.account("administrador"),
+    s = await a.login(u);
+  a.db
+    .prepare(
+      "INSERT INTO foods(name,category,quantity,expires,created_by) VALUES (?,?,?,?,?)",
+    )
+    .run('=HYPERLINK("https://example.test")', "Otros", 1, "2026-12-01", u.id);
+  a.db
+    .prepare(
+      "INSERT INTO foods(name,category,quantity,expires,created_by) VALUES (?,?,?,?,?)",
+    )
+    .run("<script>alert(1)</script>", "Otros", 1, "2026-12-01", u.id);
+  const base = `http://127.0.0.1:${a.server.address().port}/api/reports/`;
+  const csv = await (
+    await fetch(base + "export.csv", { headers: { Cookie: s.cookie } })
+  ).text();
+  assert.ok(csv.includes("\"'=HYPERLINK"));
+  const print = await fetch(base + "print", { headers: { Cookie: s.cookie } });
+  assert.equal(print.status, 200);
+  const html = await print.text();
+  assert.ok(html.includes("&lt;script&gt;alert(1)&lt;/script&gt;"));
+  assert.ok(!html.includes("<script>alert(1)</script>"));
+  assert.ok(html.includes("/report.js"));
+  assert.ok(html.includes("Preparado por:"));
+});
+test("Reportes: base vacía produce un reporte válido con totales cero", async (t) => {
+  const a = await setup(t),
+    s = await a.login(await a.account("supervisor"));
+  const r = await fetch(
+    `http://127.0.0.1:${a.server.address().port}/api/reports/print`,
+    { headers: { Cookie: s.cookie } },
+  );
+  assert.equal(r.status, 200);
+  const html = await r.text();
+  assert.ok(html.includes("No hay alimentos registrados."));
+  assert.ok(html.includes("0%"));
 });

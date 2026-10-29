@@ -2,38 +2,42 @@
 > foodsave-access@1.0.0 test
 > node --test
 
-✔ HU-01 Registro persiste lector, normaliza correo y nunca expone hash (110.617542ms)
-✔ HU-01 Rechaza contraseñas cortas, nombre vacío y correo inválido (36.412917ms)
-✔ HU-01 Rechaza correos duplicados sin crear otra cuenta (93.315833ms)
-✔ HU-02 Login correcto, sesión persistida como hash y perfil disponible (94.975375ms)
-✔ HU-02 Credenciales incorrectas no autentican y quedan auditadas (90.63525ms)
-✔ HU-02 Limita intentos repetidos (272.489792ms)
-✔ HU-03 Logout revoca la sesión y el token antiguo recibe 401 (93.041958ms)
-✔ HU-04 Administrador lista usuarios sin hashes (94.371583ms)
-✔ HU-04 Cambio de rol revoca sesiones y aplica nuevos permisos (190.117416ms)
-✔ HU-04 Desactivación bloquea sesión y login; reactivación permite entrar (212.376459ms)
-✔ HU-04 Impide retirar el acceso del propio administrador (92.436958ms)
-✔ HU-05 Modifica permisos y revoca sesiones del perfil (178.0505ms)
-✔ HU-05 Protege permisos administrativos y valida códigos (89.041709ms)
-✔ HU-06 Matriz de accesos por perfil se valida en servidor (276.722708ms)
-✔ HU-06 Anónimo no accede a ningún módulo protegido (31.566791ms)
-✔ HU-06 Lector no puede modificar usuarios ni permisos (92.09625ms)
-✔ HU-07 Auditoría guarda actor, acción, objetivo y fecha (90.154208ms)
-✔ Seguridad: CSRF y origen externo rechazados (89.601958ms)
-✔ Seguridad: sesión expirada rechazada (92.075042ms)
-✔ Seguridad: parámetros SQL no permiten saltar autenticación (59.29025ms)
-✔ HU-06 Inventario: lector consulta; editor crea y procesa alimentos; supervisor ve reportes (205.770708ms)
-✔ Inventario rechaza fechas inexistentes, cantidades y categorías inválidas (92.493ms)
-✔ Cookie HttpOnly y SameSite, recursos locales y cabeceras de seguridad (92.947666ms)
-✔ Datos de usuario malformados reciben 400 y no afectan permisos (120.062958ms)
-✔ Regresión: veinte logins correctos no bloquean el entorno compartido (630.919084ms)
-✔ Regresión: un login correcto no borra fallos previos y el noveno intento se bloquea (316.99675ms)
-✔ Regresión: el límite de registro no bloquea el inicio de sesión (332.156ms)
-ℹ tests 27
+✔ HU-01 Registro persiste lector, normaliza correo y nunca expone hash (192.182ms)
+✔ HU-01 Rechaza contraseñas cortas, nombre vacío y correo inválido (65.80825ms)
+✔ HU-01 Rechaza correos duplicados sin crear otra cuenta (124.615292ms)
+✔ HU-02 Login correcto, sesión persistida como hash y perfil disponible (102.487ms)
+✔ HU-02 Credenciales incorrectas no autentican y quedan auditadas (94.426625ms)
+✔ HU-02 Limita intentos repetidos (307.887625ms)
+✔ HU-03 Logout revoca la sesión y el token antiguo recibe 401 (154.061ms)
+✔ HU-04 Administrador lista usuarios sin hashes (101.601042ms)
+✔ HU-04 Cambio de rol revoca sesiones y aplica nuevos permisos (195.309875ms)
+✔ HU-04 Desactivación bloquea sesión y login; reactivación permite entrar (217.828083ms)
+✔ HU-04 Impide retirar el acceso del propio administrador (97.499333ms)
+✔ HU-05 Modifica permisos y revoca sesiones del perfil (181.508708ms)
+✔ HU-05 Protege permisos administrativos y valida códigos (90.945041ms)
+✔ HU-06 Matriz de accesos por perfil se valida en servidor (269.348333ms)
+✔ HU-06 Anónimo no accede a ningún módulo protegido (38.354459ms)
+✔ HU-06 Lector no puede modificar usuarios ni permisos (128.320625ms)
+✔ HU-07 Auditoría guarda actor, acción, objetivo y fecha (102.051791ms)
+✔ Seguridad: CSRF y origen externo rechazados (96.193375ms)
+✔ Seguridad: sesión expirada rechazada (90.703959ms)
+✔ Seguridad: parámetros SQL no permiten saltar autenticación (61.185541ms)
+✔ HU-06 Inventario: lector consulta; editor crea y procesa alimentos; supervisor ve reportes (220.47375ms)
+✔ Inventario rechaza fechas inexistentes, cantidades y categorías inválidas (91.369583ms)
+✔ Cookie HttpOnly y SameSite, recursos locales y cabeceras de seguridad (94.186209ms)
+✔ Datos de usuario malformados reciben 400 y no afectan permisos (127.373792ms)
+✔ Regresión: veinte logins correctos no bloquean el entorno compartido (974.45575ms)
+✔ Regresión: un login correcto no borra fallos previos y el noveno intento se bloquea (377.258ms)
+✔ Regresión: el límite de registro no bloquea el inicio de sesión (364.696958ms)
+✔ Reportes: exportación y vista imprimible rechazan anónimos y perfiles sin permiso (92.99875ms)
+✔ Reportes: CSV incluye inventario e historial completos, resumen y auditoría (142.975791ms)
+✔ Reportes: neutraliza fórmulas CSV y escapa HTML de datos ingresados (311.747ms)
+✔ Reportes: base vacía produce un reporte válido con totales cero (269.934167ms)
+ℹ tests 31
 ℹ suites 0
-ℹ pass 27
+ℹ pass 31
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 4240.10525
+ℹ duration_ms 6169.749584

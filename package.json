@@ -11,7 +11,8 @@
     "test": "node --test",
     "demo": "node demo.mjs",
     "seed": "node seed.mjs",
-    "test:browser": "node scripts/browser-check.cjs"
+    "test:browser": "node scripts/browser-check.cjs",
+    "test:reports": "node scripts/report-browser-check.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

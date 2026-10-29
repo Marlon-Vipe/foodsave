@@ -5,7 +5,7 @@ Fecha de validación: 28 de octubre de 2026, America/Santo_Domingo.
 ## Resultado local
 
 - Entorno: Node.js 26.9.0, SQLite 3.53.4, Chromium mediante Playwright 1.62.1.
-- Suite HTTP: **27 casos, 27 aprobados, 0 fallos**. Ejecución registrada en `test-results.txt`.
+- Suite HTTP: **31 casos, 31 aprobados, 0 fallos**. Ejecución registrada en `test-results.txt`.
 - Demostración automatizada: aprobada. Comprueba registro, login/logout, administración, cambios de rol y permisos desde la interfaz, alimentos, reportes y rechazo 403 a un lector. Informe en `docs/evidence/browser-results.json`.
 - No hubo errores JavaScript durante la demostración. El login no presentó desbordamiento horizontal en los tres anchos comprobados (390, 768 y 1440 px).
 - Ocho capturas verificadas y video MP4 de 30.7 segundos. Se ajustó la velocidad de reproducción de la captura automatizada para facilitar su lectura. El video no tiene audio. La decodificación completa con FFmpeg terminó sin errores.
@@ -24,3 +24,9 @@ Los commits posteriores de documentación no alteran el código validado. La ent
 ## Corrección del bloqueo de demostración
 
 Se separaron los contadores de registro y login. Los inicios de sesión correctos dejan de consumir el presupuesto de fallos y no borran los fallos anteriores. Tres pruebas de regresión verifican veinte accesos correctos consecutivos, el bloqueo tras ocho fallos y la independencia del registro. Se retiraron los contadores del entorno local afectado y se comprobó el acceso real de administrador con respuesta 200, seguido del cierre de sesión.
+
+## Generación de reportes · 29 de octubre de 2026
+
+Se incorporaron descarga CSV y vista imprimible para guardar como PDF desde el navegador. Incluyen resumen, inventario e historial completos, sin el límite de 100 filas de la pantalla. La generación queda auditada y exige `reports.read`.
+
+Las cuatro pruebas HTTP nuevas verifican autorización, más de 100 alimentos, totales, CSV UTF-8, neutralización de fórmulas, escape de HTML y un reporte vacío. La comprobación de Chromium confirmó la descarga real, el contenido, la vista de impresión y la invocación del botón Imprimir, con datos de prueba en una base aislada. La captura `09-report-print.png` se revisó visualmente. No se exportaron datos de la instalación del usuario como evidencia.

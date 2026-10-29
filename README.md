@@ -55,7 +55,7 @@ Los identificadores siguientes se asignaron a partir de la épica recibida; no s
 npm test
 ```
 
-Resultado de la entrega: **27 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
+Resultado de la entrega: **31 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
 
 Para reproducir las verificaciones de navegador, con la aplicación de demostración ejecutándose y cuentas recién creadas:
 
@@ -85,7 +85,7 @@ El flujo completo para la exposición está en [docs/DEMO.md](docs/DEMO.md).
 
 El login adapta el frame `4:25` de Figma a HTML/CSS con campos reales, conserva sus colores, composición móvil e iconos originales descargados localmente. El inventario toma como referencia el frame `4:267`. Las pantallas de administración se diseñaron para este incremento, ya que no aparecen en el prototipo. No se modificó el archivo de Figma.
 
-Los alimentos, filtros, consumo/descarte e indicadores usan SQLite; no dependen de valores simulados en el navegador. Las estadísticas cuentan registros de alimentos, no suman sus cantidades. La consulta de actividades muestra los últimos 200 eventos; el historial de alimentos muestra los últimos 100 procesados.
+Los alimentos, filtros, consumo/descarte e indicadores usan SQLite; no dependen de valores simulados en el navegador. Las estadísticas cuentan registros de alimentos, no suman sus cantidades. La consulta de actividades muestra los últimos 200 eventos; el historial de la pantalla muestra los últimos 100 procesados. Los reportes descargables e imprimibles incluyen todos los alimentos y el historial completo.
 
 La entrega incluye instrucciones reproducibles y un entorno local; no representa un despliegue público. Recuperación por correo, verificación de correo, MFA, notificaciones externas, separación por organizaciones y el resto del producto completo quedan fuera del incremento. El enlace de ayuda de contraseña informa que se debe contactar al administrador; no envía correos.
 
@@ -102,3 +102,14 @@ La entrega incluye instrucciones reproducibles y un entorno local; no representa
 Las consultas usan parámetros SQL. Las sesiones tienen tokens aleatorios de 256 bits almacenados como SHA-256 en el servidor. Las cookies usan `HttpOnly` y `SameSite=Strict`; las mutaciones requieren origen autorizado, JSON y token CSRF (excepto registro/login, que validan el origen). Hay límite de tamaño de solicitud, límite de intentos persistido en SQLite, CSP y escape de los valores mostrados en HTML. Las contraseñas y tokens no aparecen en respuestas ni en la bitácora.
 
 La bitácora no tiene API de edición/borrado; un operador con acceso directo al archivo SQLite puede modificarlo. Para producción se requieren HTTPS, control del acceso al archivo de datos, copias de seguridad y una política de conservación de actividades. La validación local y el resultado de CI deben distinguirse: consulta el estado real de Actions para confirmar su ejecución remota.
+
+## Generar y descargar un reporte
+
+En **Reportes**, los perfiles con `reports.read` (administrador y supervisor de forma predeterminada) tienen dos opciones:
+
+- **Descargar reporte CSV:** archivo UTF-8 compatible con Excel, con fecha de emisión, responsable, resumen de registros, porcentaje de aprovechamiento y detalle completo de alimentos: ID, nombre, categoría, cantidad, vencimiento y estado.
+- **Generar reporte / guardar PDF:** abre una versión imprimible en otra pestaña. El botón Imprimir / guardar como PDF abre el diálogo del navegador; selecciona Guardar como PDF para obtener el archivo.
+
+Cada generación registra `report.generated` en Actividades. Ambas rutas validan la sesión y el permiso en el servidor: `GET /api/reports/export.csv` y `GET /api/reports/print`. El reporte refleja todos los datos existentes al momento de generarlo. Sus indicadores cuentan registros; las cantidades aparecen por separado en el detalle.
+
+Se neutralizan fórmulas en campos CSV y se escapa el HTML del reporte. La descarga y la impresión se verifican con datos aislados mediante `npm run test:reports` (requiere Playwright y Chromium como la prueba general del navegador). [Captura de impresión](docs/evidence/09-report-print.png).

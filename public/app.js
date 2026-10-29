@@ -155,26 +155,21 @@ async function renderPage() {
           )
           .join("") ||
         '<tr><td colspan="4" class="empty">No se encontraron usuarios.</td></tr>';
-      main
-        .querySelectorAll("[data-save]")
-        .forEach(
-          (b) =>
-            (b.onclick = () =>
-              changeUser(Number(b.dataset.save), {
-                role: main.querySelector(`[data-role="${b.dataset.save}"]`)
-                  .value,
-              })),
-        );
-      main
-        .querySelectorAll("[data-toggle]")
-        .forEach(
-          (b) =>
-            (b.onclick = () =>
-              changeUser(Number(b.dataset.toggle), {
-                active: !users.find((u) => u.id === Number(b.dataset.toggle))
-                  .active,
-              })),
-        );
+      main.querySelectorAll("[data-save]").forEach(
+        (b) =>
+          (b.onclick = () =>
+            changeUser(Number(b.dataset.save), {
+              role: main.querySelector(`[data-role="${b.dataset.save}"]`).value,
+            })),
+      );
+      main.querySelectorAll("[data-toggle]").forEach(
+        (b) =>
+          (b.onclick = () =>
+            changeUser(Number(b.dataset.toggle), {
+              active: !users.find((u) => u.id === Number(b.dataset.toggle))
+                .active,
+            })),
+      );
     };
     main.querySelector("#search").oninput = draw;
     draw();
@@ -223,6 +218,7 @@ async function renderPage() {
       "food.created": "Alimento registrado",
       "food.consumed": "Alimento aprovechado",
       "food.wasted": "Alimento descartado",
+      "report.generated": "Reporte generado",
     };
     main.innerHTML =
       heading(
@@ -319,7 +315,7 @@ async function renderPage() {
         "Estadísticas",
         "Tus pequeños cambios generan impacto.",
       ) +
-      `<div class="stats"><div class="stat"><small>APROVECHAMIENTO</small><strong>${total ? Math.round((100 * count("consumed")) / total) : 0}%</strong><small>De alimentos procesados</small></div><div class="stat"><small>APROVECHADOS</small><strong>${count("consumed")}</strong><small>Alimentos consumidos</small></div><div class="stat"><small>DESPERDICIADOS</small><strong>${count("wasted")}</strong><small>Alimentos descartados</small></div></div><section class="panel"><h2>Historial</h2><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Categoría</th><th>Resultado</th></tr></thead><tbody>${history.map((f) => `<tr><td>${escape(f.name)}</td><td>${escape(f.category)}</td><td>${f.status === "consumed" ? "Aprovechado" : "Descartado"}</td></tr>`).join("") || '<tr><td colspan="3" class="empty">Aún no hay alimentos procesados.</td></tr>'}</tbody></table></div></section>`;
+      `<div class="report-actions"><a class="button" href="/api/reports/export.csv">Descargar reporte CSV</a><a class="button secondary-link" href="/api/reports/print" target="_blank" rel="noopener">Generar reporte / guardar PDF</a></div><div class="stats"><div class="stat"><small>APROVECHAMIENTO</small><strong>${total ? Math.round((100 * count("consumed")) / total) : 0}%</strong><small>De alimentos procesados</small></div><div class="stat"><small>APROVECHADOS</small><strong>${count("consumed")}</strong><small>Alimentos consumidos</small></div><div class="stat"><small>DESPERDICIADOS</small><strong>${count("wasted")}</strong><small>Alimentos descartados</small></div></div><section class="panel"><h2>Historial</h2><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Categoría</th><th>Resultado</th></tr></thead><tbody>${history.map((f) => `<tr><td>${escape(f.name)}</td><td>${escape(f.category)}</td><td>${f.status === "consumed" ? "Aprovechado" : "Descartado"}</td></tr>`).join("") || '<tr><td colspan="3" class="empty">Aún no hay alimentos procesados.</td></tr>'}</tbody></table></div></section>`;
     return;
   }
   main.innerHTML =

@@ -1,0 +1,149 @@
+:root {
+  font-family: Arial, sans-serif;
+  color: #153b2d;
+  background: #eef3ec;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+.toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+}
+button {
+  background: #237854;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 20px;
+  font: inherit;
+  cursor: pointer;
+}
+a {
+  color: #237854;
+}
+main {
+  max-width: 1000px;
+  margin: 0 auto 30px;
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+}
+.brand {
+  font-size: 28px;
+  font-weight: 800;
+}
+h1 {
+  margin-bottom: 12px;
+}
+header p,
+.note,
+footer {
+  font-size: 12px;
+  color: #526b5c;
+  line-height: 1.6;
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 28px 0;
+}
+.summary div {
+  padding: 14px;
+  background: #edf4e9;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.summary strong {
+  display: block;
+  font-size: 26px;
+  margin-top: 9px;
+}
+h2 {
+  font-size: 18px;
+  margin-top: 30px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed;
+}
+th,
+td {
+  text-align: left;
+  padding: 11px 7px;
+  border-bottom: 1px solid #dce5d9;
+  overflow-wrap: anywhere;
+}
+th {
+  background: #edf4e9;
+}
+th:first-child {
+  width: 6%;
+}
+th:nth-child(2) {
+  width: 25%;
+}
+th:nth-child(4) {
+  width: 10%;
+}
+tr {
+  break-inside: avoid;
+}
+footer {
+  margin-top: 25px;
+}
+@media (max-width: 600px) {
+  main {
+    padding: 20px;
+  }
+  .summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .toolbar {
+    gap: 12px;
+    font-size: 12px;
+  }
+  table {
+    font-size: 10px;
+  }
+  th,
+  td {
+    padding: 7px 3px;
+  }
+}
+@page {
+  size: A4;
+  margin: 14mm;
+}
+@media print {
+  :root {
+    background: white;
+  }
+  .toolbar {
+    display: none;
+  }
+  main {
+    margin: 0;
+    padding: 0;
+    max-width: none;
+    border-radius: 0;
+  }
+  .summary {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  thead {
+    display: table-header-group;
+  }
+  footer {
+    font-size: 10px;
+  }
+}

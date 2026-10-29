@@ -1,3 +1,4 @@
+import { collectReport, reportCSV, reportHTML } from "./reports.mjs";
 import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -60,6 +61,8 @@ export async function createApp({
           "/": "index.html",
           "/app.js": "app.js",
           "/style.css": "style.css",
+          "/report.css": "report.css",
+          "/report.js": "report.js",
         };
         if (/^\/assets\/[a-f0-9]+\.svg$/.test(path))
           files[path] = path.slice(1);
@@ -223,7 +226,9 @@ export async function createApp({
           // Successful authentication does not consume the failed-attempt budget.
           // Preserve failures from other requests, including concurrent ones.
           for (const key of attemptKeys)
-            db.prepare("UPDATE attempts SET count=MAX(0,count-1) WHERE key=?").run(key);
+            db.prepare(
+              "UPDATE attempts SET count=MAX(0,count-1) WHERE key=?",
+            ).run(key);
           audit(candidate.id, "login.succeeded", candidate.id, ip);
         });
         res.setHeader(
@@ -458,6 +463,34 @@ export async function createApp({
           audit(user.id, "food." + body.status, id, ip);
         });
         json(200, { ok: true });
+        return;
+      }
+      if (
+        ["/api/reports/export.csv", "/api/reports/print"].includes(path) &&
+        req.method === "GET"
+      ) {
+        requirePermission("reports.read");
+        const report = collectReport(db, user);
+        const csv = path.endsWith(".csv");
+        audit(
+          user.id,
+          "report.generated",
+          JSON.stringify({
+            format: csv ? "csv" : "print",
+            records: report.foods.length,
+          }),
+          ip,
+        );
+        res.setHeader(
+          "Content-Type",
+          csv ? "text/csv; charset=utf-8" : "text/html; charset=utf-8",
+        );
+        if (csv)
+          res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="foodsave-reporte-${report.generatedAt.slice(0, 10)}.csv"`,
+          );
+        res.end(csv ? reportCSV(report) : reportHTML(report));
         return;
       }
       if (path === "/api/reports" && req.method === "GET") {
