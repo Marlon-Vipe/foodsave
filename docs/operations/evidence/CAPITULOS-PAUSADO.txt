@@ -1,0 +1,22 @@
+FOODSAVE · GESTIÓN OPERATIVA
+Demostración pausada del flujo real de la aplicación. Sin audio.
+
+0:00 - Inicio de sesión · perfil editor
+0:10 - Consultar el módulo de operaciones
+0:14 - Crear una operación de consumo
+0:37 - Actualizar la operación antes de iniciarla
+0:51 - Consultar los cambios registrados
+1:00 - Iniciar la operación · estado En proceso
+1:07 - Verificar inventario antes del cierre
+1:14 - Cambiar al perfil supervisor para cerrar
+1:32 - Cerrar la operación con una observación
+1:46 - Historial completo · creación, actualización, inicio y cierre
+1:54 - Confirmar el descuento: quedan 6 unidades
+2:01 - Filtrar por estado, fecha prevista y responsable
+2:17 - Descargar el reporte de operaciones en CSV
+2:21 - Generar reporte imprimible para guardar como PDF
+2:38 - Crear una segunda operación de descarte
+3:13 - Cancelar con motivo · sin descontar inventario
+3:26 - Resumen final de operaciones
+
+Grabación realizada con datos de demostración en una base aislada.

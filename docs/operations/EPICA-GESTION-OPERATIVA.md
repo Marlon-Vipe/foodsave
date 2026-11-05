@@ -103,7 +103,7 @@ En una instalación existente, iniciar el servidor aplica la migración automát
 - [Guion de demostración](DEMO.md).
 - [Informe de verificación](VERIFICACION.md).
 - [Resultado del navegador](evidence/browser-results.json).
-- [Video](evidence/demo-operaciones.mp4).
+- [Video](evidence/demo-operaciones-pausado.mp4).
 - Capturas en `docs/operations/evidence/`: vista inicial, creación, actualización/inicio, cierre/historial, filtros, reporte, cancelación y móvil.
 
 Los datos de las evidencias se generaron en una base en memoria, independiente de la instalación local. Las fechas 2099 de las pruebas son datos deliberados para que los alimentos de prueba no caduquen al repetirlas; la demostración local usa fechas calculadas al ejecutar `demo:operations`.

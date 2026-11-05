@@ -125,7 +125,7 @@ Los filtros de estado, rango de fecha prevista y responsable se aplican también
 - [Épica, historias GO-01 a GO-08, criterios y API](docs/operations/EPICA-GESTION-OPERATIVA.md).
 - [Guion de demostración](docs/operations/DEMO.md).
 - [Validación del incremento](docs/operations/VERIFICACION.md).
-- [Video de operaciones](docs/operations/evidence/demo-operaciones.mp4).
+- [Video de operaciones](docs/operations/evidence/demo-operaciones-pausado.mp4).
 - [Capturas y resultado del navegador](docs/operations/evidence/).
 
 Ejecuta `npm run demo:operations` después de preparar las cuentas con `npm run demo` para añadir ejemplos operativos cuando no existen operaciones. Para probar solo el flujo nuevo en navegador usa `npm run test:operations:browser` con Playwright/Chromium instalados; utiliza una base aislada y no requiere que inicies el servidor.

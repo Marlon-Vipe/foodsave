@@ -47,3 +47,11 @@ El código se integró en `main` de [Marlon-Vipe/foodsave](https://github.com/Ma
 **GitHub Actions aprobado:** [ejecución 42016120389](https://github.com/Marlon-Vipe/foodsave/actions/runs/42016120389). El workflow completo terminó con success, incluida la suite HTTP y las verificaciones de navegador configuradas para accesos, reportes y operaciones. Los bloqueos de facturación que figuran en los informes anteriores no impidieron esta ejecución.
 
 El cierre de la entrega actualiza este informe y elimina una grabación temporal de la pestaña de impresión; no modifica la lógica de negocio validada. El entorno entregado es local y no se realizó un despliegue público.
+
+## Demostración pausada
+
+Se añadió `evidence/demo-operaciones-pausado.mp4`, de **3 minutos y 35 segundos** (215.04 s), 1440 × 1000, H.264 y sin audio. Es una grabación nueva con escritura progresiva y pausas de lectura, reproducida a velocidad real. Incluye 17 capítulos integrados en el MP4 y el índice `CAPITULOS-PAUSADO.txt`.
+
+Muestra inicio de sesión, creación y edición por el editor, consulta del historial, inicio, inventario antes del cierre, cambio a supervisor, cierre con observación, historial completo, inventario después del cierre, filtros combinados, descarga CSV, reporte imprimible, creación de un descarte y cancelación con motivo.
+
+La grabación se hizo con datos de demostración en memoria. Se comprobaron el inventario de 10 a 6 unidades, el CSV filtrado de una operación, los estados Cerrada y Cancelada y la ausencia de errores JavaScript. FFmpeg decodificó el archivo completo sin errores y se revisaron fotogramas de la creación, el cierre, el reporte y el resumen final. La versión breve anterior se conserva.
