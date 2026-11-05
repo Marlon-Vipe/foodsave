@@ -1,3 +1,4 @@
+import { renderOperations } from "./operations.js";
 const app = document.querySelector("#app");
 let auth = null,
   current = "users",
@@ -10,6 +11,10 @@ const labels = {
   "inventory.read": "Ver inventario",
   "inventory.manage": "Gestionar alimentos",
   "reports.read": "Ver reportes",
+  "operations.read": "Consultar operaciones",
+  "operations.manage": "Gestionar operaciones",
+  "operations.close": "Cerrar operaciones",
+  "operations.report": "Generar reportes de operaciones",
 };
 const escape = (value) =>
   String(value ?? "").replace(
@@ -93,6 +98,7 @@ const navItems = [
   ["audit", "Actividades", "audit.read"],
   ["inventory", "Inventario", "inventory.read"],
   ["reports", "Reportes", "reports.read"],
+  ["operations", "Operaciones", "operations.read"],
 ];
 async function renderShell() {
   app.innerHTML = `<div class="shell"><aside class="sidebar"><div><div class="brand">foodsave<span>.</span></div><small>Come mejor, desperdicia menos.</small></div><nav>${navItems
@@ -135,6 +141,10 @@ function heading(tag, title, description) {
 }
 async function renderPage() {
   const main = app.querySelector("main");
+  if (current === "operations") {
+    await renderOperations({ main, api, has, notify });
+    return;
+  }
   if (current === "users") {
     const { users } = await api("users");
     main.innerHTML =
@@ -219,6 +229,12 @@ async function renderPage() {
       "food.consumed": "Alimento aprovechado",
       "food.wasted": "Alimento descartado",
       "report.generated": "Reporte generado",
+      "operation.created": "Operación creada",
+      "operation.updated": "Operación actualizada",
+      "operation.started": "Operación iniciada",
+      "operation.closed": "Operación cerrada",
+      "operation.cancelled": "Operación cancelada",
+      "operation.report": "Reporte de operaciones generado",
     };
     main.innerHTML =
       heading(

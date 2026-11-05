@@ -1,3 +1,4 @@
+import { handleOperations } from "./operations.mjs";
 import { collectReport, reportCSV, reportHTML } from "./reports.mjs";
 import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
@@ -60,6 +61,7 @@ export async function createApp({
         const files = {
           "/": "index.html",
           "/app.js": "app.js",
+          "/operations.js": "operations.js",
           "/style.css": "style.css",
           "/report.css": "report.css",
           "/report.js": "report.js",
@@ -252,6 +254,23 @@ export async function createApp({
         req.headers["x-csrf-token"] !== session.csrf
       )
         fail(403, "Token de seguridad inválido");
+      if (
+        handleOperations({
+          req,
+          res,
+          path,
+          url,
+          db,
+          user,
+          body,
+          requirePermission,
+          audit,
+          transaction,
+          json,
+          fail,
+        })
+      )
+        return;
       if (path === "/api/me" && req.method === "GET") {
         json(200, {
           user: publicUser(user),

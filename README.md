@@ -1,4 +1,4 @@
-# FoodSave · Épica 1: usuarios, roles y accesos
+# FoodSave · Usuarios, accesos y gestión operativa
 
 Incremento ejecutable de autenticación, autorización y trazabilidad para **FoodSave**. El usuario confirmó que esta entrega corresponde a FoodSave, aunque el enunciado original mencionaba una plataforma inmobiliaria. La referencia visual es [el prototipo de Figma](https://www.figma.com/design/qVQHZLksgSjCqXir63rG9z/Untitled?node-id=4-25).
 
@@ -55,7 +55,7 @@ Los identificadores siguientes se asignaron a partir de la épica recibida; no s
 npm test
 ```
 
-Resultado de la entrega: **31 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
+Resultado de la entrega: **53 pruebas HTTP aprobadas**. GitHub Actions no inició sus pasos por un bloqueo de facturación/límite de gasto de la cuenta; el resultado remoto de las pruebas queda sin verificar. Consulta [el informe de verificación](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
 
 Para reproducir las verificaciones de navegador, con la aplicación de demostración ejecutándose y cuentas recién creadas:
 
@@ -113,3 +113,23 @@ En **Reportes**, los perfiles con `reports.read` (administrador y supervisor de 
 Cada generación registra `report.generated` en Actividades. Ambas rutas validan la sesión y el permiso en el servidor: `GET /api/reports/export.csv` y `GET /api/reports/print`. El reporte refleja todos los datos existentes al momento de generarlo. Sus indicadores cuentan registros; las cantidades aparecen por separado en el detalle.
 
 Se neutralizan fórmulas en campos CSV y se escapa el HTML del reporte. La descarga y la impresión se verifican con datos aislados mediante `npm run test:reports` (requiere Playwright y Chromium como la prueba general del navegador). [Captura de impresión](docs/evidence/09-report-print.png).
+
+## Nuevo incremento · Gestión Operativa
+
+La épica del 5 de noviembre de 2026 incorpora **Operaciones**: consumo y descarte de alimentos, estados Pendiente → En proceso → Cerrada y cancelación justificada, responsables habilitados, historial antes/después y cierre atómico con inventario.
+
+El editor crea, edita, inicia y cancela; el supervisor consulta, cierra y reporta; el administrador dispone de todo el flujo. El lector no tiene acceso operativo. Los permisos se pueden ajustar en la matriz de roles. Las operaciones cerradas o canceladas son definitivas y los cierres simultáneos no descuentan dos veces.
+
+Los filtros de estado, rango de fecha prevista y responsable se aplican también a los reportes CSV e imprimibles. El historial de cada operación conserva todos sus cambios. El consumo vencido, cantidades excesivas y responsables inactivos se rechazan en el servidor.
+
+- [Épica, historias GO-01 a GO-08, criterios y API](docs/operations/EPICA-GESTION-OPERATIVA.md).
+- [Guion de demostración](docs/operations/DEMO.md).
+- [Validación del incremento](docs/operations/VERIFICACION.md).
+- [Video de operaciones](docs/operations/evidence/demo-operaciones.mp4).
+- [Capturas y resultado del navegador](docs/operations/evidence/).
+
+Ejecuta `npm run demo:operations` después de preparar las cuentas con `npm run demo` para añadir ejemplos operativos cuando no existen operaciones. Para probar solo el flujo nuevo en navegador usa `npm run test:operations:browser` con Playwright/Chromium instalados; utiliza una base aislada y no requiere que inicies el servidor.
+
+La migración es automática e idempotente. Conserva usuarios, alimentos y permisos previos, añade permisos operativos una sola vez y revoca las sesiones de los roles actualizados para requerir un nuevo login. El cierre parcial reduce `foods.quantity`; cuando llega a cero el alimento se clasifica consumido/descartado. Las unidades procesadas constan en la operación.
+
+Las operaciones abiertas no reservan existencias: se valida de nuevo al cerrar. La fecha de los filtros es la **fecha prevista**, no la de creación o cierre. El responsable es un dato del equipo compartido y no restringe por sí mismo la propiedad de las operaciones.

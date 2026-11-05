@@ -1,0 +1,27 @@
+{
+  "result": "passed",
+  "checks": [
+    "Regla de existencias rechaza cantidad excesiva",
+    "Creación de operación pendiente",
+    "Actualización con historial e inicio de operación",
+    "Editor sin botón de cierre y API rechaza con 403",
+    "Supervisor cierra, descuenta 4 unidades y conserva historial inmutable",
+    "Filtros por estado, fecha prevista y responsable; CSV descargado coincide",
+    "Reporte imprimible preparado para guardar PDF",
+    "Consulta sin coincidencias presenta estado vacío",
+    "Cancelación justificada sin descuento de inventario",
+    "Lector sin módulo y API de consulta/reporte restringida"
+  ],
+  "errors": [],
+  "overflows": [],
+  "viewports": [
+    390,
+    768,
+    1440
+  ],
+  "editorDenied": 403,
+  "readerDenied": {
+    "list": 403,
+    "report": 403
+  }
+}

@@ -1,3 +1,8 @@
+import {
+  operationPermissions,
+  operationDefaults,
+  initializeOperations,
+} from "./operations.mjs";
 import { DatabaseSync } from "node:sqlite";
 import {
   randomBytes,
@@ -15,11 +20,16 @@ export const permissions = [
   "inventory.read",
   "inventory.manage",
   "reports.read",
+  ...operationPermissions,
 ];
 export const defaults = {
   administrador: permissions,
-  editor: ["inventory.read", "inventory.manage"],
-  supervisor: ["inventory.read", "reports.read"],
+  editor: ["inventory.read", "inventory.manage", ...operationDefaults.editor],
+  supervisor: [
+    "inventory.read",
+    "reports.read",
+    ...operationDefaults.supervisor,
+  ],
   lector: ["inventory.read"],
 };
 export const digest = (value) =>
@@ -49,6 +59,7 @@ export function openStore(path) {
       id,
       JSON.stringify(p),
     );
+  initializeOperations(db);
   return db;
 }
 export function publicUser(user) {

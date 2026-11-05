@@ -30,3 +30,7 @@ Se separaron los contadores de registro y login. Los inicios de sesión correcto
 Se incorporaron descarga CSV y vista imprimible para guardar como PDF desde el navegador. Incluyen resumen, inventario e historial completos, sin el límite de 100 filas de la pantalla. La generación queda auditada y exige `reports.read`.
 
 Las cuatro pruebas HTTP nuevas verifican autorización, más de 100 alimentos, totales, CSV UTF-8, neutralización de fórmulas, escape de HTML y un reporte vacío. La comprobación de Chromium confirmó la descarga real, el contenido, la vista de impresión y la invocación del botón Imprimir, con datos de prueba en una base aislada. La captura `09-report-print.png` se revisó visualmente. No se exportaron datos de la instalación del usuario como evidencia.
+
+## Gestión Operativa · 5 de noviembre de 2026
+
+El incremento posterior y sus 53 pruebas locales aprobadas se documentan en [la verificación operativa](operations/VERIFICACION.md). Incluye sus propias historias, capturas y video en `docs/operations/`. Las verificaciones fechadas arriba corresponden a las entregas anteriores.
