@@ -243,7 +243,9 @@ try {
     path: join(evidence, "06-operations-report.png"),
     fullPage: true,
   });
+  const printVideo = print.video();
   await print.close();
+  await printVideo.delete();
   checks.push("Reporte imprimible preparado para guardar PDF");
   await page.getByRole("button", { name: "Limpiar", exact: true }).click();
   await page.getByLabel("Estado", { exact: true }).selectOption("pendiente");

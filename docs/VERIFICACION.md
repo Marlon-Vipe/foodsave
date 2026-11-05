@@ -33,4 +33,4 @@ Las cuatro pruebas HTTP nuevas verifican autorización, más de 100 alimentos, t
 
 ## Gestión Operativa · 5 de noviembre de 2026
 
-El incremento posterior y sus 53 pruebas locales aprobadas se documentan en [la verificación operativa](operations/VERIFICACION.md). Incluye sus propias historias, capturas y video en `docs/operations/`. Las verificaciones fechadas arriba corresponden a las entregas anteriores.
+El incremento posterior y sus 53 pruebas locales aprobadas se documentan en [la verificación operativa](operations/VERIFICACION.md). Incluye sus propias historias, capturas y video en `docs/operations/`. GitHub Actions de ese incremento pasó en la [ejecución 42016120389](https://github.com/Marlon-Vipe/foodsave/actions/runs/42016120389). Las verificaciones y bloqueos fechados arriba corresponden a las entregas anteriores.

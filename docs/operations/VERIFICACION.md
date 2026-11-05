@@ -42,4 +42,8 @@ La primera migración revoca las sesiones de los perfiles administrador, editor 
 
 ## Repositorio y validación remota
 
-El código se integra en `main` de [Marlon-Vipe/foodsave](https://github.com/Marlon-Vipe/foodsave). El estado real de GitHub Actions se añadirá tras publicar el commit. La validación local no acredita por sí sola una ejecución remota ni un despliegue público.
+El código se integró en `main` de [Marlon-Vipe/foodsave](https://github.com/Marlon-Vipe/foodsave), commit funcional `85f087a1167c2948fe647254f557af5e0800e6c5`.
+
+**GitHub Actions aprobado:** [ejecución 42016120389](https://github.com/Marlon-Vipe/foodsave/actions/runs/42016120389). El workflow completo terminó con success, incluida la suite HTTP y las verificaciones de navegador configuradas para accesos, reportes y operaciones. Los bloqueos de facturación que figuran en los informes anteriores no impidieron esta ejecución.
+
+El cierre de la entrega actualiza este informe y elimina una grabación temporal de la pestaña de impresión; no modifica la lógica de negocio validada. El entorno entregado es local y no se realizó un despliegue público.
