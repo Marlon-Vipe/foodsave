@@ -1,3 +1,4 @@
+import { initializeLogistics, logisticsPermissions } from "./logistics.mjs";
 import {
   operationPermissions,
   operationDefaults,
@@ -21,6 +22,7 @@ export const permissions = [
   "inventory.manage",
   "reports.read",
   ...operationPermissions,
+  ...logisticsPermissions,
 ];
 export const defaults = {
   administrador: permissions,
@@ -47,7 +49,7 @@ export async function verifyPassword(password, encoded) {
 }
 export function openStore(path) {
   const db = new DatabaseSync(path);
-  db.exec(`PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL;
+  db.exec(`PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL;
     CREATE TABLE IF NOT EXISTS roles (id TEXT PRIMARY KEY, permissions TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL, role TEXT NOT NULL REFERENCES roles(id), active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
     CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), csrf TEXT NOT NULL, expires INTEGER NOT NULL);
@@ -60,6 +62,7 @@ export function openStore(path) {
       JSON.stringify(p),
     );
   initializeOperations(db);
+  initializeLogistics(db);
   return db;
 }
 export function publicUser(user) {

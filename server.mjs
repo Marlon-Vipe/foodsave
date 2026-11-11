@@ -1,3 +1,4 @@
+import { foodCategories, handleLogistics, recordMovement, stockLimit } from "./logistics.mjs";
 import { handleOperations } from "./operations.mjs";
 import { collectReport, reportCSV, reportHTML } from "./reports.mjs";
 import { createServer } from "node:http";
@@ -62,6 +63,7 @@ export async function createApp({
           "/": "index.html",
           "/app.js": "app.js",
           "/operations.js": "operations.js",
+          "/logistics.js": "logistics.js",
           "/style.css": "style.css",
           "/report.css": "report.css",
           "/report.js": "report.js",
@@ -254,23 +256,21 @@ export async function createApp({
         req.headers["x-csrf-token"] !== session.csrf
       )
         fail(403, "Token de seguridad inválido");
-      if (
-        handleOperations({
-          req,
-          res,
-          path,
-          url,
-          db,
-          user,
-          body,
-          requirePermission,
-          audit,
-          transaction,
-          json,
-          fail,
-        })
-      )
-        return;
+      const context = {
+        req,
+        res,
+        path,
+        url,
+        db,
+        user,
+        body,
+        requirePermission,
+        audit,
+        transaction,
+        json,
+        fail,
+      };
+      if (handleOperations(context) || handleLogistics(context)) return;
       if (path === "/api/me" && req.method === "GET") {
         json(200, {
           user: publicUser(user),
@@ -432,17 +432,10 @@ export async function createApp({
           typeof body.name !== "string" ||
           body.name.trim().length < 2 ||
           body.name.length > 100 ||
-          ![
-            "Lácteos",
-            "Carnes",
-            "Frutas y verduras",
-            "Panadería",
-            "Congelados",
-            "Otros",
-          ].includes(body.category) ||
+          !foodCategories.includes(body.category) ||
           !Number.isInteger(body.quantity) ||
           body.quantity < 1 ||
-          body.quantity > 10000 ||
+          body.quantity > stockLimit ||
           typeof body.expires !== "string" ||
           !/^\d{4}-\d{2}-\d{2}$/.test(body.expires) ||
           !Number.isFinite(Date.parse(body.expires)) ||
@@ -461,6 +454,8 @@ export async function createApp({
               body.expires,
               user.id,
             );
+          recordMovement(db, { foodId: Number(r.lastInsertRowid), type: "entry", source: "inventory",
+            before: 0, after: body.quantity, reason: "Registro de lote", actor: user.id });
           audit(user.id, "food.created", r.lastInsertRowid, ip);
           return Number(r.lastInsertRowid);
         });
@@ -473,12 +468,12 @@ export async function createApp({
         if (!["consumed", "wasted"].includes(body.status))
           fail(400, "Estado inválido");
         transaction(() => {
-          const r = db
-            .prepare(
-              "UPDATE foods SET status=? WHERE id=? AND status='available'",
-            )
-            .run(body.status, id);
-          if (!r.changes) fail(404, "Alimento no disponible");
+          const lot = db.prepare("SELECT quantity FROM foods WHERE id=? AND status='available'").get(id);
+          if (!lot) fail(404, "Alimento no disponible");
+          db.prepare("UPDATE foods SET status=?,quantity=0 WHERE id=?").run(body.status, id);
+          if (lot.quantity > 0)
+            recordMovement(db, { foodId: id, type: "exit", source: "inventory", before: lot.quantity, after: 0,
+              reason: body.status === "consumed" ? "Consumo desde inventario" : "Descarte desde inventario", actor: user.id });
           audit(user.id, "food." + body.status, id, ip);
         });
         json(200, { ok: true });

@@ -1,3 +1,4 @@
+import { recordMovement } from "./logistics.mjs";
 import { openStore } from "./store.mjs";
 const db = openStore(process.env.DATABASE_PATH ?? "app.sqlite");
 try {
@@ -35,6 +36,8 @@ try {
           .run("Arroz · demostración operativa", "Otros", 12, expires, admin.id)
           .lastInsertRowid,
       );
+      recordMovement(db, { foodId: food, type: "entry", source: "inventory",
+        before: 0, after: 12, reason: "Lote de demostración operativa", actor: admin.id });
       for (const [title, type, quantity] of [
         ["DEMO · Consumo planificado", "consumo", 3],
         ["DEMO · Descarte por calidad", "descarte", 1],

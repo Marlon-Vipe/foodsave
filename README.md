@@ -133,3 +133,11 @@ Ejecuta `npm run demo:operations` después de preparar las cuentas con `npm run 
 La migración es automática e idempotente. Conserva usuarios, alimentos y permisos previos, añade permisos operativos una sola vez y revoca las sesiones de los roles actualizados para requerir un nuevo login. El cierre parcial reduce `foods.quantity`; cuando llega a cero el alimento se clasifica consumido/descartado. Las unidades procesadas constan en la operación.
 
 Las operaciones abiertas no reservan existencias: se valida de nuevo al cerrar. La fecha de los filtros es la **fecha prevista**, no la de creación o cierre. El responsable es un dato del equipo compartido y no restringe por sí mismo la propiedad de las operaciones.
+
+## Incremento · Gestión Logística
+
+En **Logística**, registra lotes, repón existencias, documenta salidas y consulta el historial de movimientos. El inventario y las operaciones comparten el mismo saldo. Los perfiles autorizados descargan CSV de existencias y movimientos.
+
+Para empezar en local, usa `npm run demo` y `PORT=3002 npm start`; la aplicación está en [localhost:3002](http://localhost:3002/). Para verificar el flujo en Chromium, ejecuta `npm ci`, `npx playwright install chromium` y `npm run test:logistics:browser`.
+
+[Historias y criterios](docs/logistics/EPICA-GESTION-LOGISTICA.md) · [Guía de demostración](docs/logistics/DEMO.md) · [Pruebas y capturas](docs/logistics/VERIFICACION.md)

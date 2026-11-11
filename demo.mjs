@@ -1,3 +1,4 @@
+import { recordMovement } from "./logistics.mjs";
 import { randomBytes } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import { openStore, hashPassword } from "./store.mjs";
@@ -23,24 +24,33 @@ for (const [role, name] of Object.entries({
     role === "administrador" &&
     !db.prepare("SELECT id FROM foods LIMIT 1").get()
   ) {
-    for (const [name, category, quantity, days] of [
-      ["Pollo", "Carnes", 1, 1],
-      ["Yogur natural", "Lácteos", 2, 2],
-      ["Lechuga", "Frutas y verduras", 1, 3],
-      ["Leche entera", "Lácteos", 1, 4],
-      ["Pan de molde", "Panadería", 1, 6],
-    ]) {
-      const date = new Date();
-      date.setDate(date.getDate() + days);
-      db.prepare(
-        "INSERT INTO foods(name,category,quantity,expires,created_by) VALUES (?,?,?,?,?)",
-      ).run(
-        name,
-        category,
-        quantity,
-        date.toLocaleDateString("en-CA", { timeZone: "America/Santo_Domingo" }),
-        Number(r.lastInsertRowid),
-      );
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      for (const [name, category, quantity, days] of [
+        ["Pollo", "Carnes", 1, 1],
+        ["Yogur natural", "Lácteos", 2, 2],
+        ["Lechuga", "Frutas y verduras", 1, 3],
+        ["Leche entera", "Lácteos", 1, 4],
+        ["Pan de molde", "Panadería", 1, 6],
+      ]) {
+        const date = new Date();
+        date.setDate(date.getDate() + days);
+        const food = db.prepare(
+          "INSERT INTO foods(name,category,quantity,expires,created_by) VALUES (?,?,?,?,?)",
+        ).run(
+          name,
+          category,
+          quantity,
+          date.toLocaleDateString("en-CA", { timeZone: "America/Santo_Domingo" }),
+          Number(r.lastInsertRowid),
+        );
+        recordMovement(db, { foodId: Number(food.lastInsertRowid), type: "entry", source: "inventory",
+          before: 0, after: quantity, reason: "Lote de demostración", actor: Number(r.lastInsertRowid) });
+      }
+      db.exec("COMMIT");
+    } catch (error) {
+      db.exec("ROLLBACK");
+      throw error;
     }
   }
 }

@@ -597,7 +597,7 @@ test("GO-08 Migración preserva datos y permisos existentes y solo se aplica una
     "[]",
   );
   assert.equal(
-    reopened.prepare("SELECT COUNT(*) n FROM schema_migrations").get().n,
+    reopened.prepare("SELECT COUNT(*) n FROM schema_migrations WHERE id='operations-v1'").get().n,
     1,
   );
   reopened.close();

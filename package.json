@@ -14,7 +14,8 @@
     "test:browser": "node scripts/browser-check.cjs",
     "test:reports": "node scripts/report-browser-check.mjs",
     "demo:operations": "node operations-demo.mjs",
-    "test:operations:browser": "node scripts/operations-browser-check.mjs"
+    "test:operations:browser": "node scripts/operations-browser-check.mjs",
+    "test:logistics:browser": "node scripts/logistics-browser-check.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

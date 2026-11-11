@@ -27,6 +27,7 @@ const statusLabels = {
   available: "En inventario",
   consumed: "Aprovechado",
   wasted: "Descartado",
+  distributed: "Agotado por salida logística",
 };
 export function reportCSV(report) {
   const cell = (value) => {

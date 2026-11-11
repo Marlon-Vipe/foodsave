@@ -1,3 +1,4 @@
+import { recordMovement } from "./logistics.mjs";
 export const operationPermissions = [
   "operations.read",
   "operations.manage",
@@ -492,6 +493,8 @@ export function handleOperations(ctx) {
               : "wasted",
           food.id,
         );
+        recordMovement(db, { foodId: food.id, type: "exit", source: "operation",
+          before: food.quantity, after: remaining, reason: body.note.trim(), actor: user.id, operationId: id });
         db.prepare(
           "UPDATE operations SET status='cerrada',close_note=?,closed_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP,version=version+1 WHERE id=?",
         ).run(body.note.trim(), id);
