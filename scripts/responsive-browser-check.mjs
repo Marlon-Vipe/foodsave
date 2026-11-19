@@ -41,7 +41,15 @@ try {
         rect.left >= 0 && rect.right <= innerWidth && button.contains(center);
     });
     assert(visible, "Cerrar sesión no es accesible en " + label);
-    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "Desborde de página en " + label);
+    const overflow = await page.evaluate(() => {
+      if (document.documentElement.scrollWidth <= innerWidth) return [];
+      return [...document.querySelectorAll(".sidebar, .sidebar-brand, .account, .topbar, main, .stats, .stat, .panel, .page-heading")]
+        .filter((el) => el.getBoundingClientRect().right > innerWidth)
+        .map((el) => ({ class: el.className, right: el.getBoundingClientRect().right }));
+    });
+    if (overflow.length) await page.screenshot({ path: evidence + "/responsive-overflow.png" });
+    assert.deepEqual(overflow, [], "Desborde de página en " + label);
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "Desborde de texto en " + label);
   };
   const navigate = async (name) => {
     const menu = page.locator("#menu-toggle");
