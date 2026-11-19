@@ -109,7 +109,7 @@ const navItems = [
   ["logistics", "Logística", "logistics.read"],
 ];
 async function renderShell() {
-  app.innerHTML = `<div class="shell"><aside class="sidebar"><div><div class="brand">foodsave<span>.</span></div><small>Come mejor, desperdicia menos.</small></div><nav>${navItems
+  app.innerHTML = `<div class="shell"><aside class="sidebar"><div class="sidebar-brand"><div><div class="brand">foodsave<span>.</span></div><small>Come mejor, desperdicia menos.</small></div><button type="button" id="menu-toggle" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">☰</button></div><nav id="primary-navigation" aria-label="Navegación principal">${navItems
     .filter((n) => !n[2] || has(n[2]))
     .map(
       (n) =>
@@ -118,6 +118,21 @@ async function renderShell() {
     .join(
       "",
     )}</nav><div class="account"><div><strong>${escape(auth.user.name)}</strong><small>${escape(auth.user.role)}</small></div><button id="logout">Cerrar sesión</button></div></aside><div class="workspace"><header class="topbar"><span>Mi espacio / ${navItems.find((n) => n[0] === current)?.[1] ?? "Acceso"}</span><span class="secure">Sesión protegida</span></header><main aria-live="polite"><p>Cargando…</p></main></div></div>`;
+  const sidebar = app.querySelector(".sidebar");
+  const menuToggle = app.querySelector("#menu-toggle");
+  const setMenuOpen = (open) => {
+    sidebar.dataset.menuOpen = String(open);
+    menuToggle.setAttribute("aria-expanded", String(open));
+    menuToggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+    menuToggle.textContent = open ? "✕" : "☰";
+  };
+  menuToggle.onclick = () => setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+  sidebar.onkeydown = (event) => {
+    if (event.key === "Escape") {
+      setMenuOpen(false);
+      menuToggle.focus();
+    }
+  };
   app.querySelectorAll("[data-page]").forEach(
     (button) =>
       (button.onclick = () => {

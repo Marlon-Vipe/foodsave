@@ -26,6 +26,7 @@ jobs:
       - run: npm run test:operations:browser
       - run: npm run test:logistics:browser
       - run: npm run test:logistics:dashboard
+      - run: npm run test:responsive
       - uses: actions/upload-artifact@v4
         if: always()
         with:

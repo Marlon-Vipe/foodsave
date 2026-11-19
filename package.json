@@ -16,7 +16,8 @@
     "demo:operations": "node operations-demo.mjs",
     "test:operations:browser": "node scripts/operations-browser-check.mjs",
     "test:logistics:browser": "node scripts/logistics-browser-check.mjs",
-    "test:logistics:dashboard": "node scripts/logistics-dashboard-browser.mjs"
+    "test:logistics:dashboard": "node scripts/logistics-dashboard-browser.mjs",
+    "test:responsive": "node scripts/responsive-browser-check.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

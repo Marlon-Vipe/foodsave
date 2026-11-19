@@ -39,3 +39,11 @@ La prueba de navegador usa SQLite en memoria y genera estas capturas con cuentas
 [Panel logístico](evidence/06-panel-logistico.png) · [Mínimos y alertas](evidence/07-minimos-y-alertas.png) · [Descarte preparado](evidence/08-descarte-preparado.png) · [Consulta del supervisor](evidence/09-supervisor-panel.png)
 
 [Video del flujo original de Logística](evidence/FoodSave-Video-Gestion-Logistica.mp4) · [Capítulos del video](evidence/CAPITULOS-VIDEO.txt).
+
+## Navegación adaptable
+
+`npm run test:responsive` verifica Usuarios, Roles y permisos, Actividades, Inventario, Reportes, Operaciones y Logística en 320×568, 390×844, 700×600, 701×600, 768×800, 844×390, 1024×768 y 1440×900.
+
+El botón de cierre de sesión se mantiene dentro de la pantalla y se puede pulsar tanto al inicio como al final de cada página. La prueba también verifica el menú móvil, su cierre con Escape, el cierre de sesión y ausencia de desbordes horizontales de página.
+
+[Vista móvil al final de la página](evidence/responsive-390-logout.png) · [Vista de escritorio al final de la página](evidence/responsive-1440-logout.png)
