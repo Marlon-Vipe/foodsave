@@ -51,10 +51,12 @@ export async function createApp({
       "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
     );
     const json = (status, data) => {
+      const payload = JSON.stringify(data);
       res.writeHead(status, {
         "Content-Type": "application/json; charset=utf-8",
+        "Content-Length": Buffer.byteLength(payload),
       });
-      res.end(JSON.stringify(data));
+      res.end(payload);
     };
     try {
       if (!path.startsWith("/api/")) {

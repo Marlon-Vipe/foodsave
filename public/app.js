@@ -39,6 +39,8 @@ async function api(path, method = "GET", body) {
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
+  if (!res.headers.get("content-type")?.includes("application/json"))
+    throw new Error("No se pudo conectar con FoodSave. Intenta de nuevo (HTTP " + res.status + ").");
   const data = await res.json();
   if (!res.ok) {
     if (res.status === 401 && auth) {

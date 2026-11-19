@@ -477,6 +477,9 @@ test("Cookie HttpOnly y SameSite, recursos locales y cabeceras de seguridad", as
   });
   assert.match(r.headers.get("set-cookie"), /HttpOnly/);
   assert.match(r.headers.get("set-cookie"), /SameSite=Strict/);
+  const payload = await r.text();
+  assert.equal(Number(r.headers.get("content-length")), Buffer.byteLength(payload));
+  assert.equal(r.headers.get("transfer-encoding"), null);
   assert.match(
     r.headers.get("content-security-policy"),
     /frame-ancestors 'none'/,
