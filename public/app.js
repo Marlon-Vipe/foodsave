@@ -117,7 +117,7 @@ async function renderShell() {
     )
     .join(
       "",
-    )}</nav><div class="account"><div><strong>${escape(auth.user.name)}</strong><small>${escape(auth.user.role)}</small></div><button id="logout">Cerrar sesión</button></div></aside><div class="workspace"><header class="topbar"><span>Mi espacio / ${navItems.find((n) => n[0] === current)?.[1] ?? "Acceso"}</span><span class="secure">Sesión protegida</span></header><main aria-live="polite"><p>Cargando…</p></main></div></div>`;
+    )}</nav><div class="account"><div><strong>${escape(auth.user.name)}</strong><small>${escape(auth.user.role)}</small></div><button id="logout">Cerrar sesión</button></div></aside><div class="workspace"><header class="topbar"><span>${current === "home" ? "Mi espacio" : "Mi espacio / " + (navItems.find((n) => n[0] === current)?.[1] ?? "Acceso")}</span><span class="secure">Sesión protegida</span></header><main aria-live="polite"><p>Cargando…</p></main></div></div>`;
   const sidebar = app.querySelector(".sidebar");
   const menuToggle = app.querySelector("#menu-toggle");
   const setMenuOpen = (open) => {
@@ -376,13 +376,80 @@ async function renderPage() {
       `<div class="report-actions"><a class="button" href="/api/reports/export.csv">Descargar reporte CSV</a><a class="button secondary-link" href="/api/reports/print" target="_blank" rel="noopener">Generar reporte / guardar PDF</a></div><div class="stats"><div class="stat"><small>APROVECHAMIENTO</small><strong>${total ? Math.round((100 * count("consumed")) / total) : 0}%</strong><small>De alimentos procesados</small></div><div class="stat"><small>APROVECHADOS</small><strong>${count("consumed")}</strong><small>Alimentos consumidos</small></div><div class="stat"><small>DESPERDICIADOS</small><strong>${count("wasted")}</strong><small>Alimentos descartados</small></div></div><section class="panel"><h2>Historial</h2><div class="table-wrap"><table><thead><tr><th>Alimento</th><th>Categoría</th><th>Resultado</th></tr></thead><tbody>${history.map((f) => `<tr><td>${escape(f.name)}</td><td>${escape(f.category)}</td><td>${({ consumed: "Aprovechado", wasted: "Descartado", distributed: "Agotado por salida logística" })[f.status] ?? f.status}</td></tr>`).join("") || '<tr><td colspan="3" class="empty">Aún no hay alimentos procesados.</td></tr>'}</tbody></table></div></section>`;
     return;
   }
-  main.innerHTML =
-    heading(
-      "FoodSave / Mi espacio",
-      `Hola, ${escape(auth.user.name.split(" ")[0])}`,
-      "Todo lo que necesitas para cuidar tus alimentos y reducir desperdicios.",
-    ) +
-    `<section class="panel module"><span class="badge">${escape(auth.user.role)}</span><h2>Bienvenido a tu espacio</h2><p>Tu cuenta está activa. Estas son las funcionalidades habilitadas para tu perfil:</p>${auth.permissions.map((p) => `<p>✓ ${labels[p]}</p>`).join("")}<div class="callout">Los permisos se validan en cada solicitud al servidor.</div></section>`;
+  await renderHome(main);
+}
+
+async function renderHome(main) {
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Santo_Domingo" }).format(new Date());
+  const dateLabel = new Intl.DateTimeFormat("es-DO", {
+    timeZone: "America/Santo_Domingo", weekday: "long", day: "numeric", month: "long",
+  }).format(new Date());
+  let available = null, expiring = null, expired = null;
+  if (has("logistics.read")) {
+    const { summary } = await api("logistics/dashboard");
+    available = summary.available_units;
+    expiring = summary.expiring_lots;
+    expired = summary.expired_lots;
+  } else if (has("inventory.read")) {
+    const { foods } = await api("inventory");
+    available = foods.filter((food) => food.expires >= today).reduce((sum, food) => sum + food.quantity, 0);
+    expired = foods.filter((food) => food.expires < today).length;
+    expiring = foods.filter((food) => {
+      const days = (Date.parse(food.expires) - Date.parse(today)) / 86400000;
+      return days >= 0 && days <= 7;
+    }).length;
+  }
+  const modules = [
+    { page: "inventory", title: "Inventario", group: "Alimentos", tone: "sage",
+      description: "Consulta tus alimentos, cantidades y fechas de vencimiento.", permission: "inventory.read" },
+    { page: "logistics", title: "Logística", group: "Distribución", tone: "peach",
+      description: "Revisa alertas y organiza las entradas y salidas de tus lotes.", permission: "logistics.read" },
+    { page: "operations", title: "Operaciones", group: "Planificación", tone: "blue",
+      description: "Da seguimiento al consumo y al descarte de alimentos.", permission: "operations.read" },
+    { page: "reports", title: "Reportes", group: "Resultados", tone: "sand",
+      description: "Consulta el aprovechamiento y descarga tus reportes.", permission: "reports.read" },
+    { page: "users", title: "Usuarios", group: "Equipo", tone: "blue",
+      description: "Consulta las personas y los perfiles de tu plataforma.", permission: "users.read" },
+    { page: "roles", title: "Roles y permisos", group: "Configuración", tone: "sage",
+      description: "Administra qué puede hacer cada perfil del equipo.", permission: "roles.manage" },
+    { page: "audit", title: "Actividades", group: "Seguimiento", tone: "sand",
+      description: "Revisa los accesos y los cambios registrados por el equipo.", permission: "audit.read" },
+  ].filter((module) => has(module.permission));
+  const primary = has("logistics.read") ? "logistics" : has("inventory.read") ? "inventory" : modules[0]?.page;
+  const primaryTitle = navItems.find((item) => item[0] === primary)?.[1];
+  main.innerHTML = `
+    <section class="home-welcome" aria-labelledby="home-title">
+      <div class="home-welcome-content">
+        <p class="home-date">${escape(dateLabel)}</p>
+        <h1 id="home-title">Hola, ${escape(auth.user.name.trim().split(/\s+/u)[0])}<span>.</span></h1>
+        <p>Cuida tus alimentos. Organiza tu día.</p>
+        ${primary ? `<button class="home-primary" data-home-page="${primary}">Ir a ${primaryTitle} <span aria-hidden="true">↗</span></button>` : ""}
+      </div>
+      <div class="home-profile">
+        <span class="home-avatar" aria-hidden="true">${escape(auth.user.name.trim().slice(0, 1).toLocaleUpperCase("es"))}</span>
+        <div><strong>${escape(auth.user.name)}</strong><span>${escape(auth.user.role)}</span></div>
+      </div>
+    </section>
+    ${available !== null ? `<section class="home-metrics" aria-label="Resumen de alimentos">
+      <article class="home-metric"><span class="home-metric-mark sage" aria-hidden="true">✓</span><div><span>Unidades disponibles</span><strong>${available}</strong><small>En lotes vigentes</small></div></article>
+      <article class="home-metric"><span class="home-metric-mark sand" aria-hidden="true">◷</span><div><span>Lotes por vencer</span><strong>${expiring}</strong><small>Hoy y los próximos 7 días</small></div></article>
+      <article class="home-metric"><span class="home-metric-mark peach" aria-hidden="true">!</span><div><span>Lotes vencidos</span><strong>${expired}</strong><small>Pendientes de revisión</small></div></article>
+    </section>` : ""}
+    <section class="home-modules" aria-labelledby="home-modules-title">
+      <div class="home-section-heading"><h2 id="home-modules-title">Tus herramientas</h2><p>Accede a las funciones de tu perfil.</p></div>
+      <div class="home-module-grid">${modules.map((module) => `
+        <button class="home-module" data-home-page="${module.page}" aria-label="Abrir ${module.title}">
+          <span class="home-module-top"><span class="home-module-group ${module.tone}">${module.group}</span><span class="home-module-arrow" aria-hidden="true">↗</span></span>
+          <strong>${module.title}</strong><span class="home-module-description">${module.description}</span>
+        </button>`).join("") || '<p class="callout">Tu cuenta está activa. Contacta al administrador para habilitar las herramientas que necesitas.</p>'}</div>
+    </section>
+    <details class="home-permissions"><summary>Ver mis permisos</summary><div>${auth.permissions.map((permission) => `<span>${escape(labels[permission] ?? permission)}</span>`).join("") || "<p>Tu perfil todavía no tiene permisos asignados.</p>"}</div></details>`;
+  main.querySelectorAll("[data-home-page]").forEach((button) => {
+    button.onclick = () => {
+      current = button.dataset.homePage;
+      renderShell();
+    };
+  });
 }
 async function changeUser(id, body) {
   try {

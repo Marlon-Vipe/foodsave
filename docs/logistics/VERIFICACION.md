@@ -42,8 +42,13 @@ La prueba de navegador usa SQLite en memoria y genera estas capturas con cuentas
 
 ## Navegación adaptable
 
-`npm run test:responsive` verifica Usuarios, Roles y permisos, Actividades, Inventario, Reportes, Operaciones y Logística en 320×568, 390×844, 700×600, 701×600, 768×800, 844×390, 1024×768 y 1440×900.
+`npm run test:responsive` verifica Mi espacio, Usuarios, Roles y permisos, Actividades, Inventario, Reportes, Operaciones y Logística en 320×568, 390×844, 700×600, 701×600, 768×800, 844×390, 1024×768 y 1440×900.
 
 El botón de cierre de sesión se mantiene dentro de la pantalla y se puede pulsar tanto al inicio como al final de cada página. La prueba también verifica el menú móvil, su cierre con Escape, el cierre de sesión y ausencia de desbordes horizontales de página.
 
 [Vista móvil al final de la página](evidence/responsive-390-logout.png) · [Vista de escritorio al final de la página](evidence/responsive-1440-logout.png)
+
+
+La pantalla **Mi espacio** muestra un resumen real del inventario y accesos directos según los permisos del usuario. La prueba responsive verifica la apertura de Inventario desde su tarjeta y que el lector solo vea sus herramientas habilitadas.
+
+[Mi espacio en escritorio](evidence/home-1440.png) · [Mi espacio en móvil](evidence/home-390.png)

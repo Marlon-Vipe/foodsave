@@ -64,9 +64,13 @@ try {
   ];
   for (const [width, height] of viewports) {
     await page.setViewportSize({ width, height });
-    for (const module of ["Usuarios", "Roles y permisos", "Actividades", "Inventario", "Reportes", "Operaciones", "Logística"]) {
+    for (const module of ["Mi espacio", "Usuarios", "Roles y permisos", "Actividades", "Inventario", "Reportes", "Operaciones", "Logística"]) {
       await navigate(module);
       await assertLogout(`${module}, ${width}×${height}, inicio`);
+      if (module === "Mi espacio" && [390, 1440].includes(width)) {
+        await page.evaluate(() => window.scrollTo(0, 0));
+        await page.screenshot({ path: evidence + `/home-${width}.png` });
+      }
       await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
       await assertLogout(`${module}, ${width}×${height}, final`);
       if (module === "Logística" && [390, 1440].includes(width))
@@ -79,11 +83,23 @@ try {
       assert.equal(await page.locator("#menu-toggle").getAttribute("aria-expanded"), "false");
     }
   }
+  await navigate("Mi espacio");
+  assert.equal(await page.getByRole("button", { name: "Abrir Inventario", exact: true }).count(), 1);
+  await page.getByRole("button", { name: "Abrir Inventario", exact: true }).click();
+  await page.getByRole("heading", { name: "Mi inventario", exact: true }).waitFor();
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole("button", { name: "Cerrar sesión", exact: true }).click();
   await page.getByRole("heading", { name: "Iniciar sesión", exact: true }).waitFor();
+  app.db.prepare("INSERT INTO users(name,email,password,role) SELECT 'Lector de prueba','lector@example.test',password,'lector' FROM users WHERE id=?").run(admin);
+  await page.getByLabel("Correo electrónico").fill("lector@example.test");
+  await page.getByLabel("Contraseña", { exact: true }).fill(password);
+  await page.getByRole("button", { name: "Entrar", exact: true }).click();
+  await page.getByRole("heading", { name: "Hola, Lector.", exact: true }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Abrir Inventario", exact: true }).count(), 1);
+  assert.equal(await page.getByRole("button", { name: "Abrir Logística", exact: true }).count(), 0);
+  assert.equal(await page.locator(".home-metric strong").first().innerText(), "171");
   assert.deepEqual(errors, []);
-  console.log("Responsive aprobado en 8 tamaños y 7 módulos: cerrar sesión visible y pulsable al inicio y al final, menú móvil, Escape, sin desborde de página y logout correcto.");
+  console.log("Responsive aprobado en 8 tamaños y 8 módulos: cerrar sesión visible y pulsable al inicio y al final, menú móvil, Escape, sin desborde de página y logout correcto.");
 } finally {
   await browser?.close();
   await new Promise((resolve) => app.server.close(resolve));
