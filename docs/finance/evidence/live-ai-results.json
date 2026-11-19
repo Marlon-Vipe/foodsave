@@ -1,0 +1,10 @@
+{
+  "result": "passed",
+  "model": "gpt-4.1-mini",
+  "products": 2,
+  "spending_cents": 34000,
+  "currency": "DOP",
+  "ocr": "real",
+  "confirmed_in": "isolated in-memory database",
+  "advice": "real"
+}

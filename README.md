@@ -144,3 +144,9 @@ Para empezar en local, usa `npm run demo` y `PORT=3002 npm start`; la aplicació
 
 
 El panel de control de Logística reúne alertas de vencimiento, mínimos por alimento y prioridad de salida FEFO. Los botones de cada alerta preparan el movimiento o el descarte correspondiente. Los avisos de próximos vencimientos cubren siete días y los mínimos se configuran en **Mínimos por alimento**. Verifica este flujo con `npm run test:logistics:dashboard`.
+
+## Finanzas y registro con OCR/IA
+
+**Finanzas** registra costos en RD$, presupuesto mensual, gastos y ayudas recibidas. Valora inventario, lotes próximos a vencer y pérdidas por descarte. **Escanear productos** lee una factura o etiqueta con OpenAI y registra los productos después de revisarlos.
+
+npm start carga la configuración privada de .env. Consulta [alcance y arquitectura](docs/finance/INCREMENTO.md), [demostración](docs/finance/DEMO.md) y [pruebas](docs/finance/VERIFICACION.md). La clave de IA permanece en el servidor y está excluida de Git.

@@ -1,3 +1,5 @@
+import { renderFinance, costFields, readCostFields, money } from "./finance.js";
+import { renderProductImports } from "./product-imports.js";
 import { renderLogistics } from "./logistics.js";
 import { renderOperations } from "./operations.js";
 const app = document.querySelector("#app");
@@ -6,6 +8,10 @@ let auth = null,
   operationDraft = null,
   register = false;
 const labels = {
+  "finance.read": "Consultar finanzas",
+  "finance.manage": "Registrar costos, presupuesto y ayudas",
+  "finance.report": "Descargar reportes financieros",
+  "ai.use": "Usar asistencia de IA",
   "users.read": "Ver usuarios",
   "users.manage": "Administrar usuarios",
   "roles.manage": "Administrar roles",
@@ -107,10 +113,12 @@ const navItems = [
   ["reports", "Reportes", "reports.read"],
   ["operations", "Operaciones", "operations.read"],
   ["logistics", "Logística", "logistics.read"],
+  ["finance", "Finanzas", "finance.read"],
+  ["scan", "Escanear productos", "ai.use"],
 ];
 async function renderShell() {
   app.innerHTML = `<div class="shell"><aside class="sidebar"><div class="sidebar-brand"><div><div class="brand">foodsave<span>.</span></div><small>Come mejor, desperdicia menos.</small></div><button type="button" id="menu-toggle" aria-expanded="false" aria-controls="primary-navigation" aria-label="Abrir menú">☰</button></div><nav id="primary-navigation" aria-label="Navegación principal">${navItems
-    .filter((n) => !n[2] || has(n[2]))
+    .filter((n) => (!n[2] || has(n[2])) && (n[0] !== "scan" || has("inventory.manage")))
     .map(
       (n) =>
         `<button class="nav ${current === n[0] ? "active" : ""}" data-page="${n[0]}">${n[1]}</button>`,
@@ -164,6 +172,18 @@ function heading(tag, title, description) {
 }
 async function renderPage() {
   const main = app.querySelector("main");
+  const openPage = async (page) => {
+    current = page;
+    await renderShell();
+  };
+  if (current === "finance") {
+    await renderFinance({ main, api, has, notify, escape, heading, openPage });
+    return;
+  }
+  if (current === "scan") {
+    await renderProductImports({ main, api, has, notify, escape, heading, openPage });
+    return;
+  }
   if (current === "logistics") {
     await renderLogistics({ main, api, has, notify, escape, heading,
       prepareDiscard: async (lot) => {
@@ -296,7 +316,7 @@ async function renderPage() {
         "Mi inventario",
         "Tus alimentos, siempre a la vista.",
       ) +
-      `<section class="panel"><div class="panel-head"><h2>Alimentos registrados</h2><input type="search" id="food-search" placeholder="Buscar alimentos…" aria-label="Buscar alimentos"></div><div class="food-filters"><button class="secondary" id="all-foods">Todos</button><button class="secondary" id="expiring">Por vencer</button><select id="category-filter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option>${["Lácteos", "Carnes", "Frutas y verduras", "Panadería", "Congelados", "Otros"].map((c) => `<option>${c}</option>`).join("")}</select></div><div id="food-list"></div></section>${has("inventory.manage") ? `<form class="panel" id="food-form"><h2>Nuevo alimento</h2><p>Añade un producto y anticipa su vencimiento.</p><label for="food-name">Nombre del alimento</label><input id="food-name" name="name" placeholder="Ej. Leche entera" minlength="2" maxlength="100" required><div class="food-form-grid"><div><label for="food-category">Categoría</label><select id="food-category" name="category">${["Lácteos", "Carnes", "Frutas y verduras", "Panadería", "Congelados", "Otros"].map((c) => `<option>${c}</option>`).join("")}</select></div><div><label for="food-date">Fecha de vencimiento</label><input id="food-date" name="expires" type="date" required></div><div><label for="food-quantity">Cantidad</label><input id="food-quantity" name="quantity" type="number" min="1" max="10000" value="1" required></div></div><button class="auth-submit" type="submit">Guardar alimento</button></form>` : '<div class="callout">Tu perfil permite consultar el inventario. La edición requiere el permiso Gestionar alimentos.</div>'}`;
+      `<section class="panel"><div class="panel-head"><h2>Alimentos registrados</h2><input type="search" id="food-search" placeholder="Buscar alimentos…" aria-label="Buscar alimentos"></div><div class="food-filters"><button class="secondary" id="all-foods">Todos</button><button class="secondary" id="expiring">Por vencer</button><select id="category-filter" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option>${["Lácteos", "Carnes", "Frutas y verduras", "Panadería", "Congelados", "Otros"].map((c) => `<option>${c}</option>`).join("")}</select></div><div id="food-list"></div></section>${has("inventory.manage") ? `<form class="panel" id="food-form"><h2>Nuevo alimento</h2><p>Añade un producto y anticipa su vencimiento.</p><label for="food-name">Nombre del alimento</label><input id="food-name" name="name" placeholder="Ej. Leche entera" minlength="2" maxlength="100" required><div class="food-form-grid"><div><label for="food-category">Categoría</label><select id="food-category" name="category">${["Lácteos", "Carnes", "Frutas y verduras", "Panadería", "Congelados", "Otros"].map((c) => `<option>${c}</option>`).join("")}</select></div><div><label for="food-date">Fecha de vencimiento</label><input id="food-date" name="expires" type="date" required></div><div><label for="food-quantity">Cantidad</label><input id="food-quantity" name="quantity" type="number" min="1" max="10000" value="1" required></div></div>${has("finance.manage") ? costFields("food") : ""}<button class="auth-submit" type="submit">Guardar alimento</button></form>` : '<div class="callout">Tu perfil permite consultar el inventario. La edición requiere el permiso Gestionar alimentos.</div>'}`;
     let expiring = false;
     const today = new Date().toLocaleDateString("en-CA", {
       timeZone: "America/Santo_Domingo",
@@ -316,7 +336,7 @@ async function renderPage() {
         list
           .map(
             (f) =>
-              `<article class="food-row"><div class="food-icon"><img src="/assets/2de35.svg" alt=""></div><div><strong>${escape(f.name)}</strong><small>${escape(f.category)} · ${f.quantity} ${f.quantity === 1 ? "unidad" : "unidades"}</small></div><span class="badge ${days(f) < 0 ? "inactive" : ""}">${days(f) < 0 ? "Vencido" : days(f) === 0 ? "Hoy" : days(f) + " días"}</span>${has("inventory.manage") ? `<div class="food-actions"><button class="secondary" data-food="${f.id}" data-status="consumed">Consumido</button><button class="danger" data-food="${f.id}" data-status="wasted">Descartado</button></div>` : ""}</article>`,
+              `<article class="food-row"><div class="food-icon"><img src="/assets/2de35.svg" alt=""></div><div><strong>${escape(f.name)}</strong><small>${escape(f.category)} · ${f.quantity} ${f.quantity === 1 ? "unidad" : "unidades"}${has("finance.read") ? (f.unit_cost_cents == null ? " · Costo pendiente" : " · " + money(f.unit_cost_cents) + " por unidad") : ""}</small></div><span class="badge ${days(f) < 0 ? "inactive" : ""}">${days(f) < 0 ? "Vencido" : days(f) === 0 ? "Hoy" : days(f) + " días"}</span>${has("inventory.manage") ? `<div class="food-actions"><button class="secondary" data-food="${f.id}" data-status="consumed">Consumido</button><button class="danger" data-food="${f.id}" data-status="wasted">Descartado</button></div>` : ""}</article>`,
           )
           .join("") ||
         '<div class="empty">No hay alimentos para mostrar.</div>';
@@ -353,6 +373,7 @@ async function renderPage() {
         const body = Object.fromEntries(new FormData(form));
         body.quantity = Number(body.quantity);
         try {
+          readCostFields(body);
           await api("inventory", "POST", body);
           notify("Alimento guardado.");
           await renderPage();
@@ -400,6 +421,10 @@ async function renderHome(main) {
     }).length;
   }
   const modules = [
+    { page: "finance", title: "Finanzas", group: "Economía", tone: "sand",
+      description: "Controla costos, presupuesto, ayudas y pérdidas de alimentos.", permission: "finance.read" },
+    { page: "scan", title: "Escanear productos", group: "Registro con IA", tone: "peach",
+      description: "Lee una factura o etiqueta y registra los productos revisados.", permission: "ai.use" },
     { page: "inventory", title: "Inventario", group: "Alimentos", tone: "sage",
       description: "Consulta tus alimentos, cantidades y fechas de vencimiento.", permission: "inventory.read" },
     { page: "logistics", title: "Logística", group: "Distribución", tone: "peach",
@@ -414,7 +439,7 @@ async function renderHome(main) {
       description: "Administra qué puede hacer cada perfil del equipo.", permission: "roles.manage" },
     { page: "audit", title: "Actividades", group: "Seguimiento", tone: "sand",
       description: "Revisa los accesos y los cambios registrados por el equipo.", permission: "audit.read" },
-  ].filter((module) => has(module.permission));
+  ].filter((module) => has(module.permission) && (module.page !== "scan" || has("inventory.manage")));
   const primary = has("logistics.read") ? "logistics" : has("inventory.read") ? "inventory" : modules[0]?.page;
   const primaryTitle = navItems.find((item) => item[0] === primary)?.[1];
   main.innerHTML = `

@@ -1,3 +1,4 @@
+import { recordFinancialMovement } from "./finance-store.mjs";
 import { initializeLogisticsDashboard, handleLogisticsDashboard } from "./logistics-dashboard.mjs";
 export const logisticsPermissions = ["logistics.read", "logistics.move", "logistics.report"];
 export const logisticsDefaults = {
@@ -55,13 +56,16 @@ export function initializeLogistics(db) {
 }
 
 // All callers write inside the same transaction as the corresponding stock change.
-export function recordMovement(db, { foodId, type, source, before, after, reason, actor, operationId = null }) {
+export function recordMovement(db, { foodId, type, source, before, after, reason, actor, operationId = null, bookedOn }) {
   const insert = db.prepare(`INSERT INTO stock_movements(food_id,type,source,quantity,before_qty,after_qty,reason,actor_id,operation_id)
     VALUES (?,?,?,?,?,?,?,?,?)`);
   // Covers demo/imported stock added outside the application after migration.
   if (before > 0 && !db.prepare("SELECT 1 FROM stock_movements WHERE food_id=? LIMIT 1").get(foodId))
     insert.run(foodId, "opening", "migration", before, 0, before, "Saldo antes del primer movimiento registrado", null, null);
-  return Number(insert.run(foodId, type, source, Math.abs(after - before), before, after, reason, actor, operationId).lastInsertRowid);
+  const quantity = Math.abs(after - before);
+  const movementId = Number(insert.run(foodId, type, source, quantity, before, after, reason, actor, operationId).lastInsertRowid);
+  recordFinancialMovement(db, { movementId, foodId, type, source, operationId, quantity, bookedOn });
+  return movementId;
 }
 
 const today = () => new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Santo_Domingo" }).format(new Date());

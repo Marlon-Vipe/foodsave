@@ -1,3 +1,8 @@
+import { handleFinance } from "./finance.mjs";
+import { handleFinanceAI } from "./finance-ai.mjs";
+import { handleProductImports } from "./product-imports.mjs";
+import { generateStructured } from "./ai-service.mjs";
+import { createFoodLot, validateFood } from "./inventory-service.mjs";
 import { foodCategories, handleLogistics, recordMovement, stockLimit } from "./logistics.mjs";
 import { handleOperations } from "./operations.mjs";
 import { collectReport, reportCSV, reportHTML } from "./reports.mjs";
@@ -17,6 +22,7 @@ export async function createApp({
   database = "app.sqlite",
   origin = "http://localhost:3000",
   secure = false,
+  ai = generateStructured,
 } = {}) {
   const db = openStore(database),
     dummy = await hashPassword(randomBytes(32).toString("hex"));
@@ -64,6 +70,8 @@ export async function createApp({
         const files = {
           "/": "index.html",
           "/app.js": "app.js",
+          "/finance.js": "finance.js",
+          "/product-imports.js": "product-imports.js",
           "/operations.js": "operations.js",
           "/logistics.js": "logistics.js",
           "/logistics-dashboard.js": "logistics-dashboard.js",
@@ -98,7 +106,8 @@ export async function createApp({
         let raw = "";
         for await (const part of req) {
           raw += part;
-          if (Buffer.byteLength(raw) > 16384)
+          const limit = path === "/api/imports/analyze" ? 4500000 : path === "/api/imports/confirm" ? 65536 : 16384;
+          if (Buffer.byteLength(raw) > limit)
             fail(413, "Solicitud demasiado grande");
         }
         try {
@@ -273,7 +282,8 @@ export async function createApp({
         json,
         fail,
       };
-      if (handleOperations(context) || handleLogistics(context)) return;
+      if (await handleProductImports(context, ai) || await handleFinanceAI(context, ai) ||
+          handleFinance(context) || handleOperations(context) || handleLogistics(context)) return;
       if (path === "/api/me" && req.method === "GET") {
         json(200, {
           user: publicUser(user),
@@ -423,7 +433,9 @@ export async function createApp({
         json(200, {
           foods: db
             .prepare(
-              "SELECT * FROM foods WHERE status='available' ORDER BY expires,id",
+              granted.includes("finance.read")
+                ? "SELECT f.*,c.unit_cost_cents FROM foods f LEFT JOIN lot_costs c ON c.food_id=f.id WHERE f.status='available' ORDER BY f.expires,f.id"
+                : "SELECT * FROM foods WHERE status='available' ORDER BY expires,id",
             )
             .all(),
         });
@@ -431,37 +443,9 @@ export async function createApp({
       }
       if (path === "/api/inventory" && req.method === "POST") {
         requirePermission("inventory.manage");
-        if (
-          typeof body.name !== "string" ||
-          body.name.trim().length < 2 ||
-          body.name.length > 100 ||
-          !foodCategories.includes(body.category) ||
-          !Number.isInteger(body.quantity) ||
-          body.quantity < 1 ||
-          body.quantity > stockLimit ||
-          typeof body.expires !== "string" ||
-          !/^\d{4}-\d{2}-\d{2}$/.test(body.expires) ||
-          !Number.isFinite(Date.parse(body.expires)) ||
-          new Date(body.expires).toISOString().slice(0, 10) !== body.expires
-        )
-          fail(400, "Revisa nombre, categoría, cantidad y fecha");
-        const id = transaction(() => {
-          const r = db
-            .prepare(
-              "INSERT INTO foods(name,category,quantity,expires,created_by) VALUES (?,?,?,?,?)",
-            )
-            .run(
-              body.name.trim(),
-              body.category,
-              body.quantity,
-              body.expires,
-              user.id,
-            );
-          recordMovement(db, { foodId: Number(r.lastInsertRowid), type: "entry", source: "inventory",
-            before: 0, after: body.quantity, reason: "Registro de lote", actor: user.id });
-          audit(user.id, "food.created", r.lastInsertRowid, ip);
-          return Number(r.lastInsertRowid);
-        });
+        if (body.unit_cost_cents !== undefined && body.unit_cost_cents !== null) requirePermission("finance.manage");
+        validateFood(body, fail);
+        const id = transaction(() => createFoodLot(db, { ...body, imported: false }, user.id, audit, ip, fail));
         json(201, { id });
         return;
       }

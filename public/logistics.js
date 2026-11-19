@@ -1,3 +1,4 @@
+import { costFields, readCostFields } from "./finance.js";
 import { createLogisticsDashboard } from "./logistics-dashboard.js";
 const categoryNames = ["Lácteos", "Carnes", "Frutas y verduras", "Panadería", "Congelados", "Otros"];
 const typeLabels = { opening: "Saldo inicial", entry: "Entrada", exit: "Salida" };
@@ -23,7 +24,7 @@ export async function renderLogistics({ main, api, has, notify, escape, heading,
         <div><label for="logistics-category">Categoría</label><select id="logistics-category" name="category">${categoryNames.map((c) => `<option>${c}</option>`).join("")}</select></div>
         <div><label for="logistics-expiry">Fecha de vencimiento</label><input id="logistics-expiry" type="date" name="expires" required></div>
         <div><label for="logistics-opening">Cantidad inicial</label><input id="logistics-opening" name="quantity" type="number" min="1" max="10000" required></div>
-      </div><div role="alert" hidden></div><button class="auth-submit" type="submit">Guardar lote</button>
+      </div>${has("finance.manage") ? costFields("logistics") : ""}<div role="alert" hidden></div><button class="auth-submit" type="submit">Guardar lote</button>
     </form>` : ""}
     ${has("logistics.move") ? `<form class="panel" id="logistics-move-form">
       <h2>Registrar movimiento</h2><p>Usa Salida para entregas o distribución. Registra el descarte de vencidos en Operaciones.</p>
@@ -147,6 +148,7 @@ export async function renderLogistics({ main, api, has, notify, escape, heading,
       const button = form.querySelector("[type=submit]");
       button.disabled = true;
       try {
+        readCostFields(data);
         const result = await api(route, "POST", data);
         form.reset();
         notify(success);

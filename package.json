@@ -7,7 +7,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "start": "node server.mjs",
+    "start": "node --env-file-if-exists=.env server.mjs",
     "test": "node --test",
     "demo": "node demo.mjs",
     "seed": "node seed.mjs",
@@ -17,7 +17,9 @@
     "test:operations:browser": "node scripts/operations-browser-check.mjs",
     "test:logistics:browser": "node scripts/logistics-browser-check.mjs",
     "test:logistics:dashboard": "node scripts/logistics-dashboard-browser.mjs",
-    "test:responsive": "node scripts/responsive-browser-check.mjs"
+    "test:responsive": "node scripts/responsive-browser-check.mjs",
+    "test:finance:browser": "node scripts/finance-browser-check.mjs",
+    "test:finance:live": "node --env-file-if-exists=.env scripts/finance-live-ai.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"
