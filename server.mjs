@@ -64,6 +64,7 @@ export async function createApp({
           "/app.js": "app.js",
           "/operations.js": "operations.js",
           "/logistics.js": "logistics.js",
+          "/logistics-dashboard.js": "logistics-dashboard.js",
           "/style.css": "style.css",
           "/report.css": "report.css",
           "/report.js": "report.js",

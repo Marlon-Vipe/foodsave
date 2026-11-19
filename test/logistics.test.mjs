@@ -211,3 +211,116 @@ test("GL-08 migra saldos existentes sin inventar movimientos históricos ni sobr
     db.close();
   }
 });
+
+test("GL-09 Panel agrupa lotes, excluye vencidos y prioriza FEFO con desempate por lote", async (t) => {
+  const { collectLogisticsDashboard } = await import("../logistics-dashboard.mjs");
+  const { db, users } = await setup(t);
+  const add = (name, category, quantity, expires, status = "available") => Number(db.prepare(
+    "INSERT INTO foods(name,category,quantity,expires,status,created_by) VALUES (?,?,?,?,?,?)"
+  ).run(name, category, quantity, expires, status, users.administrador).lastInsertRowid);
+  const later = add("Arroz integral", "Otros", 9, "2030-04-20");
+  const first = add("  ARROZ   integral ", "Otros", 4, "2030-04-10");
+  const tied = add("Arroz integral", "Otros", 3, "2030-04-10");
+  const expired = add("Arroz integral", "Otros", 50, "2030-04-09");
+  const edge = add("Yogur", "Lácteos", 2, "2030-04-17");
+  const outside = add("Leche", "Lácteos", 3, "2030-04-18");
+  add("Arroz integral", "Otros", 8, "2030-04-10", "wasted");
+  add("Arroz integral", "Otros", 0, "2030-04-10");
+  add("Arroz integral", "Carnes", 1, "2030-04-10");
+  db.prepare("INSERT INTO stock_minimums(product_key,category,minimum,updated_by) VALUES ('arroz integral','Otros',20,?)")
+    .run(users.administrador);
+  const result = collectLogisticsDashboard(db, "2030-04-10");
+  assert.equal(result.products.find((p) => p.name === "Arroz integral" && p.category === "Otros").available, 16);
+  assert.equal(result.summary.available_units, 22);
+  assert.equal(result.summary.physical_units, 72);
+  assert.equal(result.summary.expiring_lots, 4);
+  assert.equal(result.summary.expired_lots, 1);
+  assert.equal(result.summary.low_stock_products, 1);
+  const rice = result.priority.filter((p) => p.category === "Otros");
+  assert.deepEqual(rice.map((p) => [p.id, p.product_priority]), [[first, 1], [tied, 2], [later, 3]]);
+  assert(result.alerts.some((a) => a.id === expired && a.kind === "expired"));
+  assert(result.alerts.some((a) => a.id === edge && a.kind === "expiring"));
+  assert(!result.alerts.some((a) => a.id === outside));
+  assert.equal(result.alerts.find((a) => a.kind === "low").missing, 4);
+});
+
+test("GL-09 Totales del día usan Santo Domingo y separan saldo inicial de entradas y salidas", async (t) => {
+  const { collectLogisticsDashboard } = await import("../logistics-dashboard.mjs");
+  const { db, users } = await setup(t);
+  const id = Number(db.prepare("INSERT INTO foods(name,category,quantity,expires,created_by) VALUES ('Arroz','Otros',10,'2099-12-31',?)")
+    .run(users.administrador).lastInsertRowid);
+  const insert = db.prepare("INSERT INTO stock_movements(food_id,type,source,quantity,before_qty,after_qty,reason,created_at) VALUES (?,?,?,?,?,?,'Prueba',?)");
+  insert.run(id, "entry", "inventory", 10, 0, 10, "2030-04-10 03:59:59");
+  insert.run(id, "entry", "inventory", 4, 0, 4, "2030-04-10 04:00:00");
+  insert.run(id, "exit", "operation", 2, 4, 2, "2030-04-11 03:59:59");
+  insert.run(id, "exit", "logistics", 1, 2, 1, "2030-04-11 04:00:00");
+  insert.run(id, "opening", "migration", 20, 0, 20, "2030-04-10 12:00:00");
+  const { summary } = collectLogisticsDashboard(db, "2030-04-10");
+  assert.equal(summary.entry_units_today, 4);
+  assert.equal(summary.entry_movements_today, 1);
+  assert.equal(summary.exit_units_today, 2);
+  assert.equal(summary.exit_movements_today, 1);
+});
+
+test("GL-10 Mínimos persistentes por producto, versión, validación y alerta de agotados", async (t) => {
+  const { request, login, lot, move, db } = await setup(t);
+  const editor = await login("editor");
+  const id = await lot(editor);
+  const same = await lot(editor, { name: " ARROZ   INTEGRAL " });
+  const minimum = (changes = {}) => request("logistics/minimums", {
+    ...editor, method: "PUT", body: { food_id: id, minimum: 30, expected_version: 0, ...changes },
+  });
+  assert.equal((await minimum()).status, 200);
+  let result = (await request("logistics/dashboard", editor)).body;
+  assert.equal(result.products.length, 1);
+  assert.equal(result.products[0].minimum, 30);
+  assert.equal(result.products[0].available, 20);
+  assert.equal(result.alerts.find((a) => a.kind === "low").missing, 10);
+  assert.equal((await minimum({ food_id: same })).status, 409);
+  for (const changes of [{ minimum: -1 }, { minimum: 1.5 }, { minimum: 1000001 },
+    { minimum: "30" }, { expected_version: null }, { unexpected: true }])
+    assert.equal((await minimum(changes)).status, 400);
+  assert.equal((await minimum({ food_id: 999 })).status, 404);
+  assert.equal((await move(editor, id, "exit", 10)).status, 201);
+  assert.equal((await move(editor, same, "exit", 10)).status, 201);
+  result = (await request("logistics/dashboard", editor)).body;
+  const low = result.alerts.find((a) => a.kind === "low");
+  assert.equal(low.available, 0);
+  assert.equal(low.replenishment_lot_id, null);
+  assert.equal((await minimum({ minimum: 0, expected_version: 1 })).status, 200);
+  assert.equal((await request("logistics/dashboard", editor)).body.alerts.filter((a) => a.kind === "low").length, 0);
+  assert.equal(db.prepare("SELECT COUNT(*) total FROM audit WHERE action='logistics.minimum.updated'").get().total, 2);
+  const { initializeLogistics } = await import("../logistics.mjs");
+  initializeLogistics(db);
+  assert.equal(db.prepare("SELECT version FROM stock_minimums").get().version, 2);
+});
+
+test("GL-10 Dashboard y mínimos respetan permisos, CSRF y conflictos de guardado simultáneo", async (t) => {
+  const { request, login, lot } = await setup(t);
+  const admin = await login(), supervisor = await login("supervisor"), lector = await login("lector");
+  const id = await lot(admin);
+  assert.equal((await request("logistics/dashboard")).status, 401);
+  assert.equal((await request("logistics/dashboard", lector)).status, 403);
+  assert.equal((await request("logistics/dashboard", supervisor)).status, 200);
+  const update = (session, minimum) => request("logistics/minimums", {
+    ...session, method: "PUT", body: { food_id: id, minimum, expected_version: 0 },
+  });
+  assert.equal((await update(supervisor, 12)).status, 403);
+  assert.equal((await update({ ...admin, csrf: null }, 12)).status, 403);
+  assert.equal((await update({ ...admin, site: "http://example.test" }, 12)).status, 403);
+  const results = await Promise.all([update(admin, 12), update(admin, 15)]);
+  assert.deepEqual(results.map((r) => r.status).sort(), [200, 409]);
+});
+
+test("GL-10 Error de auditoría revierte también el cambio de mínimo", async (t) => {
+  const { request, login, lot, db } = await setup(t);
+  const admin = await login(), id = await lot(admin);
+  db.exec("CREATE TRIGGER fail_minimum_audit BEFORE INSERT ON audit WHEN NEW.action='logistics.minimum.updated' BEGIN SELECT RAISE(ABORT,'rollback minimum'); END");
+  const previous = console.error;
+  console.error = () => {};
+  try {
+    assert.equal((await request("logistics/minimums", { ...admin, method: "PUT",
+      body: { food_id: id, minimum: 20, expected_version: 0 } })).status, 500);
+  } finally { console.error = previous; }
+  assert.equal(db.prepare("SELECT COUNT(*) total FROM stock_minimums").get().total, 0);
+});

@@ -1,3 +1,4 @@
+import { initializeLogisticsDashboard, handleLogisticsDashboard } from "./logistics-dashboard.mjs";
 export const logisticsPermissions = ["logistics.read", "logistics.move", "logistics.report"];
 export const logisticsDefaults = {
   administrador: logisticsPermissions,
@@ -45,6 +46,7 @@ export function initializeLogistics(db) {
         db.prepare("DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE role=?)").run(role);
       }
     }
+    initializeLogisticsDashboard(db);
     db.exec("COMMIT");
   } catch (error) {
     db.exec("ROLLBACK");
@@ -72,7 +74,9 @@ const csv = (rows) => "\uFEFF" + rows.map((row) => row.map((value) => {
   return '"' + s.replaceAll('"', '""') + '"';
 }).join(",")).join("\r\n") + "\r\n";
 
-export function handleLogistics({ req, res, path, url, db, user, body, requirePermission, audit, transaction, json, fail }) {
+export function handleLogistics(context) {
+  const { req, res, path, url, db, user, body, requirePermission, audit, transaction, json, fail } = context;
+  if (handleLogisticsDashboard(context)) return true;
   if (!path.startsWith("/api/logistics/")) return false;
   const ip = req.socket.remoteAddress;
   const date = today();

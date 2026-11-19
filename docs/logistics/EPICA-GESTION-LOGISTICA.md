@@ -32,3 +32,17 @@ El navegador sirve HTML/CSS/JS de FoodSave; la vista Logística usa la misma API
 | `POST /api/inventory` | `inventory.manage`; el formulario en Logística reutiliza este endpoint |
 
 Para actualizar una instalación, realiza una copia consistente de SQLite antes del primer arranque con la nueva versión. La migración se aplica automáticamente. Los usuarios afectados pueden iniciar sesión de nuevo con sus credenciales anteriores.
+
+## Ampliación · Panel de control logístico
+
+| ID | Historia | Criterios de aceptación |
+|---|---|---|
+| GL-09 | Consultar el control logístico y priorizar salidas | Se muestran unidades disponibles, lotes por vencer, vencidos y entradas/salidas del día. Los movimientos del día usan el calendario de Santo Domingo y excluyen saldos de apertura. FEFO ordena lotes disponibles por vencimiento y luego ID; cada alimento y categoría tiene su propia prioridad. |
+| GL-10 | Configurar mínimos y consultar alertas | Se configura un mínimo entero de 0 a 1 000 000 por alimento y categoría. Se agrupan nombres normalizados por Unicode NFKC, mayúsculas/minúsculas y espacios. El saldo disponible suma lotes vigentes; se alerta cuando es menor que el mínimo. Cero desactiva el aviso. El valor persiste al reiniciar, se audita y exige la versión actual para evitar sobrescrituras simultáneas. |
+| GL-11 | Actuar desde alertas y prioridades | Los usuarios autorizados pueden preparar una entrada o salida con el lote seleccionado. Los vencidos abren el formulario de descarte en Operaciones con lote y cantidad. El usuario elige responsable y confirma su creación. Si el alimento está agotado o no admite reposición en un lote vigente, se prepara el registro de un lote nuevo. El supervisor consulta los datos y los mínimos. |
+
+Los avisos de vencimiento abarcan hoy y los siguientes siete días. Los vencidos se distinguen visualmente y quedan fuera de las recomendaciones de salida. La disponibilidad considera que un alimento puede utilizarse durante su fecha de vencimiento. FEFO sirve como recomendación y permite que el usuario seleccione otro lote vigente.
+
+Los mínimos emplean los permisos existentes: `logistics.read` para consultar, y `logistics.read` junto con `logistics.move` para configurar. Preparar un descarte requiere `operations.read` y `operations.manage`; su cierre conserva el permiso `operations.close`.
+
+Se añaden `GET /api/logistics/dashboard` y `PUT /api/logistics/minimums`. El almacenamiento usa `stock_minimums`, con clave compuesta de alimento normalizado y categoría, referencia al usuario que configuró el mínimo, fecha y versión. La migración `logistics-dashboard-v1` es idempotente y conserva los datos anteriores.

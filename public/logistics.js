@@ -1,3 +1,4 @@
+import { createLogisticsDashboard } from "./logistics-dashboard.js";
 const categoryNames = ["Lácteos", "Carnes", "Frutas y verduras", "Panadería", "Congelados", "Otros"];
 const typeLabels = { opening: "Saldo inicial", entry: "Entrada", exit: "Salida" };
 const sourceLabels = { migration: "Saldo de apertura", inventory: "Inventario", logistics: "Logística", operation: "Operación" };
@@ -6,10 +7,10 @@ const stamp = new Intl.DateTimeFormat("es-DO", { timeZone: "America/Santo_Doming
 const lotOptions = (lots, escape) => lots.map((l) =>
   `<option value="${l.id}">${escape(l.name)} · lote #${l.id} · vence ${escape(l.expires)}</option>`).join("");
 
-export async function renderLogistics({ main, api, has, notify, escape, heading }) {
+export async function renderLogistics({ main, api, has, notify, escape, heading, prepareDiscard }) {
   const canReport = has("logistics.report");
   main.innerHTML = heading("FoodSave / Inventario", "Logística", "Registra lotes, controla las existencias y consulta cada entrada y salida.") +
-    `<div class="stats" id="logistics-stats"></div>
+    `<div id="logistics-dashboard"></div>
     <section class="panel" aria-labelledby="stock-title">
       <div class="panel-head"><h2 id="stock-title">Existencias por lote</h2>${canReport ? '<a class="button" href="/api/logistics/stock.csv">Descargar existencias CSV</a>' : ""}</div>
       <p>La disponibilidad excluye los lotes vencidos o cerrados.</p>
@@ -69,11 +70,41 @@ export async function renderLogistics({ main, api, has, notify, escape, heading 
       : "Selecciona un lote disponible.";
     el("#logistics-move-form [type=submit]").disabled = !lot || el("#logistics-move-form").dataset.pending === "true";
   };
+  const dashboard = createLogisticsDashboard({
+    root: el("#logistics-dashboard"), api, has, escape, notify,
+    onRefresh: () => Promise.all([loadStock(), loadHistory()]),
+    onAction: async (action, foodId) => {
+      const lot = lots.find((item) => item.id === foodId);
+      if (!lot) throw new Error("El lote cambió. Actualiza Logística.");
+      if (action === "discard") {
+        await prepareDiscard(lot);
+        return;
+      }
+      if (action === "new-lot") {
+        const form = el("#logistics-lot-form");
+        form.querySelector("[name=name]").value = lot.name;
+        form.querySelector("[name=category]").value = lot.category;
+        form.querySelector("[name=expires]").value = "";
+        form.querySelector("[name=quantity]").value = "";
+        form.scrollIntoView({ behavior: "smooth", block: "center" });
+        form.querySelector("[name=expires]").focus({ preventScroll: true });
+        return;
+      }
+      const form = el("#logistics-move-form");
+      const select = el("#logistics-food");
+      select.value = String(foodId);
+      if (!select.value) throw new Error("El lote ya no está disponible. Actualiza Logística.");
+      el("#logistics-type").value = action;
+      el("#logistics-quantity").value = "";
+      el("#logistics-reason").value = "";
+      message(form);
+      balance();
+      form.scrollIntoView({ behavior: "smooth", block: "center" });
+      el("#logistics-quantity").focus({ preventScroll: true });
+    },
+  });
   async function loadStock(preferredLot) {
     ({ lots } = await api("logistics/stock"));
-    const onHand = lots.reduce((sum, l) => sum + l.on_hand, 0);
-    const available = lots.reduce((sum, l) => sum + l.available, 0);
-    el("#logistics-stats").innerHTML = `<div class="stat"><small>LOTES REGISTRADOS</small><strong>${lots.length}</strong></div><div class="stat"><small>UNIDADES FÍSICAS</small><strong>${onHand}</strong></div><div class="stat"><small>UNIDADES DISPONIBLES</small><strong>${available}</strong></div>`;
     el("#logistics-stock").innerHTML = lots.map((l) => `<tr><td><strong>${escape(l.name)}</strong><small>#${l.id} · ${escape(l.category)}</small></td><td>${escape(l.expires)}</td><td>${l.on_hand}</td><td>${l.available}</td><td><span class="badge ${l.available ? "" : "inactive"}">${l.on_hand > l.available ? "Vencido" : escape(statusLabels[l.status])}</span></td></tr>`).join("") || '<tr><td colspan="5" class="empty">Aún no hay lotes registrados.</td></tr>';
     const selector = el("#history-food");
     const historyFood = selector.value;
@@ -86,6 +117,7 @@ export async function renderLogistics({ main, api, has, notify, escape, heading 
       if ([...moveSelect.options].some((o) => o.value === chosen)) moveSelect.value = chosen;
       balance();
     }
+    await dashboard.refresh();
   }
   async function loadHistory({ append = false, nextQuery = query } = {}) {
     const request = ++historyRequest;

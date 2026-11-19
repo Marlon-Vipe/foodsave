@@ -141,3 +141,6 @@ En **Logística**, registra lotes, repón existencias, documenta salidas y consu
 Para empezar en local, usa `npm run demo` y `PORT=3002 npm start`; la aplicación está en [localhost:3002](http://localhost:3002/). Para verificar el flujo en Chromium, ejecuta `npm ci`, `npx playwright install chromium` y `npm run test:logistics:browser`.
 
 [Historias y criterios](docs/logistics/EPICA-GESTION-LOGISTICA.md) · [Guía de demostración](docs/logistics/DEMO.md) · [Pruebas y capturas](docs/logistics/VERIFICACION.md)
+
+
+El panel de control de Logística reúne alertas de vencimiento, mínimos por alimento y prioridad de salida FEFO. Los botones de cada alerta preparan el movimiento o el descarte correspondiente. Los avisos de próximos vencimientos cubren siete días y los mínimos se configuran en **Mínimos por alimento**. Verifica este flujo con `npm run test:logistics:dashboard`.

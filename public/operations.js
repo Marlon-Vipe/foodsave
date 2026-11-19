@@ -33,7 +33,7 @@ const dateTime = (value) =>
     : "—";
 let filters = {},
   selected = null;
-export async function renderOperations({ main, api, has, notify }) {
+export async function renderOperations({ main, api, has, notify, draft = null }) {
   const query = new URLSearchParams(
     Object.entries(filters).filter(([, v]) => v),
   ).toString();
@@ -81,7 +81,7 @@ export async function renderOperations({ main, api, has, notify }) {
     )
     .join(
       "",
-    )}</select></div><div><label for="filter-from">Fecha prevista desde</label><input id="filter-from" name="from" type="date" value="${filters.from || ""}"></div><div><label for="filter-to">Fecha prevista hasta</label><input id="filter-to" name="to" type="date" value="${filters.to || ""}"></div><div><label for="filter-owner">Responsable</label><select id="filter-owner" name="responsible_id">${ownerOptions(filters.responsible_id, true)}</select></div><button type="submit">Filtrar operaciones</button><button type="button" id="clear-filters" class="secondary">Limpiar</button></form><div class="operation-report-actions">${has("operations.report") ? `<a class="button" href="/api/operations/export.csv${query ? "?" + query : ""}">Descargar operaciones CSV</a><a class="button secondary-link" href="/api/operations/print${query ? "?" + query : ""}" target="_blank" rel="noopener">Imprimir reporte de operaciones</a>` : ""}<small>${operations.length} operaciones encontradas · El reporte utiliza estos filtros.</small></div><div class="table-wrap"><table><thead><tr><th>Operación</th><th>Alimento / cantidad</th><th>Responsable</th><th>Fecha prevista</th><th>Estado</th><th>Detalle</th></tr></thead><tbody>${operations.map((o) => `<tr><td><strong>#${o.id} · ${escape(o.title)}</strong><small>${types[o.type]}</small></td><td>${escape(o.food_name)}<small>${o.quantity} unidades</small></td><td>${escape(o.responsible_name)}</td><td>${o.scheduled_date}</td><td><span class="badge ${o.status === "cancelada" ? "inactive" : ""}">${states[o.status]}</span></td><td><button class="secondary" data-operation="${o.id}">Ver operación</button></td></tr>`).join("") || '<tr><td colspan="6" class="empty">No hay operaciones para los filtros seleccionados.</td></tr>'}</tbody></table></div></section><div id="operation-detail"></div>${has("operations.manage") ? `<section class="panel"><h2>Nueva operación</h2><p>El inventario se descuenta al cerrar la operación. Las operaciones pendientes no reservan existencias.</p><form id="create-operation">${fields()}<button type="submit" class="auth-submit">Crear operación</button></form></section>` : ""}`;
+    )}</select></div><div><label for="filter-from">Fecha prevista desde</label><input id="filter-from" name="from" type="date" value="${filters.from || ""}"></div><div><label for="filter-to">Fecha prevista hasta</label><input id="filter-to" name="to" type="date" value="${filters.to || ""}"></div><div><label for="filter-owner">Responsable</label><select id="filter-owner" name="responsible_id">${ownerOptions(filters.responsible_id, true)}</select></div><button type="submit">Filtrar operaciones</button><button type="button" id="clear-filters" class="secondary">Limpiar</button></form><div class="operation-report-actions">${has("operations.report") ? `<a class="button" href="/api/operations/export.csv${query ? "?" + query : ""}">Descargar operaciones CSV</a><a class="button secondary-link" href="/api/operations/print${query ? "?" + query : ""}" target="_blank" rel="noopener">Imprimir reporte de operaciones</a>` : ""}<small>${operations.length} operaciones encontradas · El reporte utiliza estos filtros.</small></div><div class="table-wrap"><table><thead><tr><th>Operación</th><th>Alimento / cantidad</th><th>Responsable</th><th>Fecha prevista</th><th>Estado</th><th>Detalle</th></tr></thead><tbody>${operations.map((o) => `<tr><td><strong>#${o.id} · ${escape(o.title)}</strong><small>${types[o.type]}</small></td><td>${escape(o.food_name)}<small>${o.quantity} unidades</small></td><td>${escape(o.responsible_name)}</td><td>${o.scheduled_date}</td><td><span class="badge ${o.status === "cancelada" ? "inactive" : ""}">${states[o.status]}</span></td><td><button class="secondary" data-operation="${o.id}">Ver operación</button></td></tr>`).join("") || '<tr><td colspan="6" class="empty">No hay operaciones para los filtros seleccionados.</td></tr>'}</tbody></table></div></section><div id="operation-detail"></div>${has("operations.manage") ? `<section class="panel"><h2>Nueva operación</h2><p>El inventario se descuenta al cerrar la operación. Las operaciones pendientes no reservan existencias.</p><form id="create-operation">${fields(draft ?? {})}<button type="submit" class="auth-submit">Crear operación</button></form></section>` : ""}`;
   main.querySelector("#refresh-operations").onclick = refresh;
   main.querySelector("#operation-filters").onsubmit = (e) => {
     e.preventDefault();
@@ -195,5 +195,8 @@ export async function renderOperations({ main, api, has, notify }) {
             notify(e.message),
           )),
     );
-  if (selected) await show(selected);
+  if (draft && create) {
+    create.scrollIntoView({ behavior: "smooth", block: "center" });
+    create.querySelector("[name=responsible_id]").focus({ preventScroll: true });
+  } else if (selected) await show(selected);
 }

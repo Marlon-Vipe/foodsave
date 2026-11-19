@@ -21,3 +21,17 @@ Abre [FoodSave](http://localhost:3002/) e inicia sesión con la cuenta de admini
 Para explicar la integración: “Logística, Inventario y Operaciones comparten el saldo del lote. Cuando se cierra una operación de consumo o descarte, FoodSave descuenta las unidades y registra la salida en el mismo historial”.
 
 Las capturas y los comandos de prueba están en [Verificación](VERIFICACION.md).
+
+## Mostrar el panel de control
+
+1. Registra dos lotes de **Arroz integral**, ambos en **Otros**. Usa una fecha de mañana para uno y una fecha dentro de seis días para el otro.
+2. Vuelve al inicio de **Logística**. En **Próximas salidas** aparece primero el lote que vence mañana.
+3. Abre **Mínimos por alimento** y configura un mínimo superior a la suma de ambos lotes. Guarda el valor y selecciona **Existencias bajas** en el filtro de alertas.
+4. Usa **Registrar entrada** desde la alerta para preparar el movimiento. Introduce una cantidad y el motivo, y guarda. El panel se actualiza con el nuevo saldo.
+5. Usa **Registrar salida** desde el primer lote de **Próximas salidas**. El formulario ya tiene seleccionado ese lote.
+6. Si hay un lote vencido, usa **Preparar descarte**. FoodSave abre Operaciones con el lote, tipo y cantidad preparados. Selecciona el responsable y confirma la creación.
+7. Pulsa **Actualizar panel** para volver a consultar existencias, alertas e historial.
+
+El video de la entrega muestra el flujo original de Logística. Las capturas 06 a 09 de evidencia muestran la ampliación del panel, mínimos y preparación de descarte.
+
+[Video del flujo original de Logística](evidence/FoodSave-Video-Gestion-Logistica.mp4) · [Capítulos del video](evidence/CAPITULOS-VIDEO.txt).

@@ -3,6 +3,7 @@ import { renderOperations } from "./operations.js";
 const app = document.querySelector("#app");
 let auth = null,
   current = "users",
+  operationDraft = null,
   register = false;
 const labels = {
   "users.read": "Ver usuarios",
@@ -147,11 +148,23 @@ function heading(tag, title, description) {
 async function renderPage() {
   const main = app.querySelector("main");
   if (current === "logistics") {
-    await renderLogistics({ main, api, has, notify, escape, heading });
+    await renderLogistics({ main, api, has, notify, escape, heading,
+      prepareDiscard: async (lot) => {
+        operationDraft = {
+          type: "descarte", food_id: lot.id, quantity: lot.on_hand,
+          title: ("Descarte de " + lot.name).slice(0, 120),
+          notes: "Preparado desde una alerta logística de vencimiento.",
+        };
+        current = "operations";
+        await renderShell();
+      },
+    });
     return;
   }
   if (current === "operations") {
-    await renderOperations({ main, api, has, notify });
+    const draft = operationDraft;
+    operationDraft = null;
+    await renderOperations({ main, api, has, notify, draft });
     return;
   }
   if (current === "users") {
@@ -244,6 +257,7 @@ async function renderPage() {
       "operation.closed": "Operación cerrada",
       "operation.cancelled": "Operación cancelada",
       "operation.report": "Reporte de operaciones generado",
+      "logistics.minimum.updated": "Mínimo de existencias actualizado",
       "logistics.movement": "Movimiento logístico registrado",
       "logistics.report": "Reporte logístico generado",
     };
