@@ -20,7 +20,7 @@ FoodSave se vincula al ODS 12 mediante iniciativas que reduzcan desperdicios de 
 | Versión ejecutable | Node.js 24+, SQLite local y comandos de ejecución reproducibles, abajo |
 | Historias y aceptación | [HISTORIAS.md](HISTORIAS.md), GN-01 a GN-14 |
 | Pruebas y resultados | [VERIFICACION.md](VERIFICACION.md), test/business.test.mjs y scripts/business-browser-check.mjs |
-| Evidencia | [Ocho capturas del flujo y perfiles](evidence/), generadas con datos sintéticos de demostración |
+| Evidencia | [Video pausado de 28 etapas](VIDEO.md) y [ocho capturas del flujo y perfiles](evidence/), con datos sintéticos de demostración |
 | Documentación afectada | Este directorio y entrada de README; arquitectura, datos, API y guía de clase |
 | Paquete transferible | FoodSave-Gestion-Negocios.zip, con código completo, documentación, capturas, GITHUB.txt y LEEME.txt; sin claves ni datos personales locales |
 
@@ -70,4 +70,4 @@ La captura automatizada se hace en bases en memoria con cuentas ficticias; no mo
 
 ## Límites del incremento
 
-Los recursos digitales se registran administrativamente; no se compran ni activan licencias del proveedor. No hay integración con sistemas de licenciamiento externos. Los costos de contratos y presupuestos se consultan en este módulo y su reporte; no se convierten automáticamente en gastos del módulo Finanzas. Las mediciones se registran manualmente con una fuente textual o enlace; no se infieren automáticamente desde el inventario ni se adjuntan archivos. Las monedas/unidades diferentes se mantienen separadas. La aplicación usa un espacio compartido, sin separación por organizaciones. No se incluye video nuevo: el requisito de evidencia se cubre con capturas y una guía de demostración reproducible.
+Los recursos digitales se registran administrativamente; no se compran ni activan licencias del proveedor. No hay integración con sistemas de licenciamiento externos. Los costos de contratos y presupuestos se consultan en este módulo y su reporte; no se convierten automáticamente en gastos del módulo Finanzas. Las mediciones se registran manualmente con una fuente textual o enlace; no se infieren automáticamente desde el inventario ni se adjuntan archivos. Las monedas/unidades diferentes se mantienen separadas. La aplicación usa un espacio compartido, sin separación por organizaciones. La evidencia incluye un video nuevo del flujo completo, capturas y una guía de demostración reproducible.

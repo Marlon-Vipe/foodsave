@@ -1,0 +1,30 @@
+{
+  "result": "passed",
+  "errors": [],
+  "chapters": 28,
+  "businessStatus": "completed",
+  "dimensions": [
+    {
+      "dimension": "economic"
+    },
+    {
+      "dimension": "environmental"
+    },
+    {
+      "dimension": "social"
+    }
+  ],
+  "measurements": 3,
+  "assignments": 3,
+  "released": 1,
+  "activeAssignments": 2,
+  "renewedUntil": "2027-02-24",
+  "apiExternal": false,
+  "syntheticData": true,
+  "durationSeconds": 417.72,
+  "codec": "h264",
+  "resolution": "1440x1000",
+  "chapterCount": 28,
+  "fullDecode": "passed",
+  "sha256": "842ea9913278e92e4b8a6510a6ef513a455f72363be8e75e155d3192cdaacc8b"
+}

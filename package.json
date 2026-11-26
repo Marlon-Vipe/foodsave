@@ -20,7 +20,8 @@
     "test:responsive": "node scripts/responsive-browser-check.mjs",
     "test:finance:browser": "node scripts/finance-browser-check.mjs",
     "test:finance:live": "node --env-file-if-exists=.env scripts/finance-live-ai.mjs",
-    "test:business:browser": "node scripts/business-browser-check.mjs"
+    "test:business:browser": "node scripts/business-browser-check.mjs",
+    "demo:business:video": "node scripts/business-demo-video.mjs"
   },
   "devDependencies": {
     "playwright": "1.62.1"

@@ -6,7 +6,7 @@ Incremento ejecutable de autenticación, autorización y trazabilidad para **Foo
 
 Implementa **Negocios e impacto ODS** y **Software y licencias**, cubriendo tanto la descripción/rúbrica como la demostración del mandato del 26 de noviembre de 2026. Incluye proyectos, indicadores con mediciones y evidencia, capacidad/vigencias, asignaciones a usuarios/equipos/áreas, renovación, historial y tres reportes CSV.
 
-Documentación de entrega, historias, arquitectura, guía para clase y capturas: [docs/business/ENTREGA.md](docs/business/ENTREGA.md). Verificación actual: **90 pruebas de API aprobadas**, flujo de navegador y responsive en ocho tamaños/doce módulos. Los perfiles administrador/editor/supervisor reciben los nuevos permisos mediante migración; deben volver a iniciar sesión una vez. El lector conserva su acceso anterior.
+Documentación de entrega, historias, arquitectura, guía para clase, video pausado y capturas: [docs/business/ENTREGA.md](docs/business/ENTREGA.md). Verificación actual: **90 pruebas de API aprobadas**, flujo de navegador y responsive en ocho tamaños/doce módulos. Los perfiles administrador/editor/supervisor reciben los nuevos permisos mediante migración; deben volver a iniciar sesión una vez. El lector conserva su acceso anterior.
 
 ## Ejecutar
 

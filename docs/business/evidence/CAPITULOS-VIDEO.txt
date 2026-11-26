@@ -1,0 +1,32 @@
+FOODSAVE · GESTIÓN DE NEGOCIOS Y LICENCIAS
+Duración: 06:57 · Grabación real pausada · Sin audio
+Datos ficticios de demostración; base aislada sin modificar app.sqlite.
+
+00:00  FoodSave · Negocios y licencias
+00:14  Registrar un negocio sostenible
+00:37  Crear un proyecto con responsable y fechas
+00:54  Activar el negocio
+01:11  Iniciar el proyecto
+01:23  Definir el indicador ambiental
+01:40  Registrar medición con evidencia · ambiental
+01:52  Definir el indicador social
+02:10  Registrar medición con evidencia · social
+02:22  Definir el indicador económico
+02:40  Registrar medición con evidencia · económico
+02:52  Consultar el impacto en tres dimensiones
+03:04  Descargar el reporte de impacto
+03:16  Completar proyecto y negocio
+03:34  Registrar software y proveedor
+03:49  Registrar un equipo y un área
+04:11  Registrar contrato y vigencia
+04:31  Asignar un cupo · usuario Carlos Méndez
+04:43  Asignar un cupo · Equipo comedor 01
+04:55  Asignar un cupo · Área de logística
+05:07  Comprobar que no quedan cupos
+05:17  Liberar la asignación de un usuario
+05:32  Consultar próximos vencimientos y reportes
+05:50  Renovar la vigencia del contrato
+06:05  Verificar el efecto de la renovación
+06:15  Consultar historial de licencias
+06:27  Acceso de consulta para supervisión
+06:47  Cierre del flujo de demostración

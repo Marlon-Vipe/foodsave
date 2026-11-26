@@ -52,3 +52,8 @@ Para explicar arquitectura: “El navegador usa módulos JavaScript y consulta n
 - Origen/CSRF inválido: abrir exactamente APP_ORIGIN, recargar y volver a entrar.
 - ODS sin selección, fechas invertidas o evidencia vacía: corregir el campo; el error aparece en el formulario sin perder lo escrito.
 - Software o referencia ya existen: consultarlos y usarlos; para una segunda demostración utilizar otro sufijo DEMO-002.
+
+
+## Video para acompañar la exposición
+
+[Reproducir el video pausado de Negocios y Licencias](evidence/FoodSave-Video-Gestion-Negocios-Licencias.mp4). Incluye rótulos y 28 etapas para seguir con calma. Consulta [los capítulos](evidence/CAPITULOS-VIDEO.txt) para ir directamente a una función. La grabación es sin audio y usa datos ficticios.

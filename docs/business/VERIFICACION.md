@@ -53,3 +53,8 @@ Las capturas provienen del flujo real de la aplicación con registros ficticios.
 ## Preservación de la instalación local
 
 Antes de iniciar la versión nueva se respaldó SQLite fuera del repositorio. Se conservaron cinco usuarios, siete alimentos, ocho movimientos logísticos y cero movimientos financieros existentes. La nueva funcionalidad no altera cantidades ni costos de inventario. Se verifica integridad con PRAGMA foreign_key_check.
+
+
+## Grabación pausada del flujo
+
+Se añadió [el video de Negocios y Licencias](VIDEO.md), con 28 etapas, rótulos y pausas de lectura. El ensayo y la grabación definitiva completaron negocio y proyecto, registró tres dimensiones y mediciones, asignó tres cupos, liberó uno y renovó la licencia conservando dos asignaciones activas. Se verificaron las descargas de los tres CSV y el perfil de supervisor sin acciones de administración, sin errores JavaScript. El MP4 dura 417.72 segundos, usa H.264 a 1440×1000 e incluye 28 capítulos. Su decodificación completa pasó sin errores y se revisaron 14 muestras de imagen del recorrido. Los resultados se documentan en [video-verification.json](evidence/video-verification.json).
