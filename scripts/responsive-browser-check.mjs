@@ -64,7 +64,7 @@ try {
   ];
   for (const [width, height] of viewports) {
     await page.setViewportSize({ width, height });
-    for (const module of ["Mi espacio", "Usuarios", "Roles y permisos", "Actividades", "Inventario", "Reportes", "Operaciones", "Logística", "Finanzas", "Escanear productos"]) {
+    for (const module of ["Mi espacio", "Usuarios", "Roles y permisos", "Actividades", "Inventario", "Reportes", "Operaciones", "Logística", "Finanzas", "Escanear productos", "Negocios e impacto", "Software y licencias"]) {
       await navigate(module);
       await assertLogout(`${module}, ${width}×${height}, inicio`);
       if (module === "Mi espacio" && [390, 1440].includes(width)) {
@@ -99,7 +99,7 @@ try {
   assert.equal(await page.getByRole("button", { name: "Abrir Logística", exact: true }).count(), 0);
   assert.equal(await page.locator(".home-metric strong").first().innerText(), "171");
   assert.deepEqual(errors, []);
-  console.log("Responsive aprobado en 8 tamaños y 10 módulos: cerrar sesión visible y pulsable al inicio y al final, menú móvil, Escape, sin desborde de página y logout correcto.");
+  console.log("Responsive aprobado en 8 tamaños y 12 módulos: cerrar sesión visible y pulsable al inicio y al final, menú móvil, Escape, sin desborde de página y logout correcto.");
 } finally {
   await browser?.close();
   await new Promise((resolve) => app.server.close(resolve));

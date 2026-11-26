@@ -1554,3 +1554,183 @@ button.home-module {
     padding: 16px;
   }
 }
+
+/* Gestión de negocios: portafolio, impacto y recursos digitales. */
+.business-overview {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  margin:24px 0}
+.business-overview article {
+  padding:22px;
+  border:1px solid #dce6dc;
+  border-radius:20px;
+  background:linear-gradient(130deg,#fff,#eef5ed)}
+.business-overview strong {
+  display:block;
+  font-size:2rem;
+  color:#174b3a}
+.business-overview small {
+  color:#52705e}
+.business-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:16px}
+.business-toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:end;
+  gap:14px}
+.business-toolbar label {
+  flex:1 1 160px;
+  margin:0}
+.business-toolbar .button,.business-toolbar button {
+  margin:0}
+.business-cards {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));
+  gap:16px}
+.business-card,.business-indicator {
+  min-width:0;
+  padding:22px;
+  border:1px solid #d8e4d8;
+  border-radius:18px;
+  background:#fafcf9;
+  text-align:left;
+  color:#183e31;
+  overflow-wrap:anywhere}
+.business-card {
+  cursor:pointer;
+  font:inherit}
+.business-card:hover,.business-card.selected {
+  border-color:#268461;
+  background:#f0f7ee;
+  box-shadow:0 4px 18px #173e3110}
+.business-card div {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center}
+.business-card h3,.business-indicator h3 {
+  margin:16px 0 8px;
+  font-size:1.15rem}
+.business-card p {
+  font-size:.92rem;
+  color:#55705f}
+.business-card>span,.business-card>small {
+  display:block;
+  margin-top:12px}
+.business-badge {
+  display:inline-block;
+  font-size:.77rem;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#edf0ed;
+  color:#486051}
+.state-active,.state-valid,.state-completed {
+  background:#dff1e1;
+  color:#23583a}
+.state-expired,.state-expiring {
+  background:#fff0d7;
+  color:#845412}
+.state-archived,.state-disabled {
+  background:#eee9e9;
+  color:#725757}
+.business-sdgs {
+  border:1px solid #dde5d9;
+  border-radius:12px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:20px 0;
+  padding:14px}
+.business-sdgs label {
+  display:flex;
+  gap:10px;
+  align-items:start;
+  font-size:.85rem;
+  margin:0;
+  line-height:1.5;
+  font-weight:400}
+.business-sdgs input {
+  width:18px;
+  height:18px;
+  flex:0 0 18px;
+  margin:3px 0}
+.business-sdgs strong {
+  display:block}
+.business-history {
+  padding-left:22px}
+.business-history li {
+  margin:18px 0}
+.business-history small,td small {
+  display:block}
+.business-history pre {
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:#f2f5f0;
+  border-radius:10px;
+  padding:16px;
+  font-size:.8rem;
+  max-height:300px;
+  overflow:auto}
+.business-project {
+  padding:14px 0;
+  border-bottom:1px solid #e4eadd}
+.business-evidence {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  max-width:520px}
+.business-form-error {
+  color:#a53221;
+  background:#fff0e9;
+  padding:12px;
+  margin:12px 0;
+  border-radius:10px}
+.business-indicator progress {
+  width:100%;
+  accent-color:#27805b;
+  height:10px}
+.business-grid label {
+  display:block;
+  margin:10px 0}
+.business-grid input,.business-grid select {
+  width:100%;
+  min-width:0}
+.panel>summary,.business-project>summary {
+  cursor:pointer;
+  font-weight:650;
+  color:#245c43;
+  padding:6px 0}
+details>form {
+  margin-top:18px}
+#business-detail,#license-detail {
+  scroll-margin-top:24px}
+main textarea {
+  max-width:100%}
+
+@media(max-width:700px) {
+  .business-grid,.business-overview,.business-sdgs {
+  grid-template-columns:1fr}
+.business-overview {
+  gap:10px}
+.business-overview article {
+  padding:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px}
+.business-overview strong {
+  font-size:1.6rem}
+.business-toolbar {
+  align-items:stretch}
+.business-toolbar .button,.business-toolbar button {
+  width:100%}
+.business-card,.business-indicator {
+  padding:18px}
+.business-sdgs {
+  max-height:320px;
+  overflow:auto}
+.business-history {
+  padding-left:16px}
+}

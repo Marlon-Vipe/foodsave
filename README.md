@@ -1,6 +1,12 @@
-# FoodSave · Usuarios, accesos y gestión operativa
+# FoodSave · Accesos, operaciones, logística, finanzas y negocios
 
 Incremento ejecutable de autenticación, autorización y trazabilidad para **FoodSave**. El usuario confirmó que esta entrega corresponde a FoodSave, aunque el enunciado original mencionaba una plataforma inmobiliaria. La referencia visual es [el prototipo de Figma](https://www.figma.com/design/qVQHZLksgSjCqXir63rG9z/Untitled?node-id=4-25).
+
+## Incremento actual: Gestión de Negocios
+
+Implementa **Negocios e impacto ODS** y **Software y licencias**, cubriendo tanto la descripción/rúbrica como la demostración del mandato del 26 de noviembre de 2026. Incluye proyectos, indicadores con mediciones y evidencia, capacidad/vigencias, asignaciones a usuarios/equipos/áreas, renovación, historial y tres reportes CSV.
+
+Documentación de entrega, historias, arquitectura, guía para clase y capturas: [docs/business/ENTREGA.md](docs/business/ENTREGA.md). Verificación actual: **90 pruebas de API aprobadas**, flujo de navegador y responsive en ocho tamaños/doce módulos. Los perfiles administrador/editor/supervisor reciben los nuevos permisos mediante migración; deben volver a iniciar sesión una vez. El lector conserva su acceso anterior.
 
 ## Ejecutar
 
@@ -55,7 +61,7 @@ Los identificadores siguientes se asignaron a partir de la épica recibida; no s
 npm test
 ```
 
-Resultado de la entrega: **53 pruebas HTTP aprobadas**. GitHub Actions del incremento operativo también pasó. Consulta [la verificación actual](docs/operations/VERIFICACION.md) y [el historial de validaciones](docs/VERIFICACION.md). [Salida de pruebas](test-results.txt).
+Resultado actual: **90 pruebas HTTP aprobadas**. Consulta [la verificación de Gestión de Negocios](docs/business/VERIFICACION.md). Los resultados anteriores se conservan como historial en [la verificación operativa](docs/operations/VERIFICACION.md), [la verificación inicial](docs/VERIFICACION.md) y test-results.txt.
 
 Para reproducir las verificaciones de navegador, con la aplicación de demostración ejecutándose y cuentas recién creadas:
 

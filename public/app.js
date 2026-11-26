@@ -1,3 +1,5 @@
+import { renderBusinesses } from "./businesses.js";
+import { renderLicenses } from "./licenses.js";
 import { renderFinance, costFields, readCostFields, money } from "./finance.js";
 import { renderProductImports } from "./product-imports.js";
 import { renderLogistics } from "./logistics.js";
@@ -8,6 +10,12 @@ let auth = null,
   operationDraft = null,
   register = false;
 const labels = {
+  "business.read": "Consultar negocios e impacto ODS",
+  "business.manage": "Gestionar negocios, proyectos e indicadores",
+  "business.report": "Exportar impacto ODS",
+  "licenses.read": "Consultar software y licencias",
+  "licenses.manage": "Registrar y asignar licencias",
+  "licenses.report": "Exportar uso y vencimientos",
   "finance.read": "Consultar finanzas",
   "finance.manage": "Registrar costos, presupuesto y ayudas",
   "finance.report": "Descargar reportes financieros",
@@ -106,6 +114,8 @@ function renderAuth() {
 }
 const navItems = [
   ["home", "Mi espacio", null],
+  ["businesses", "Negocios e impacto", "business.read"],
+  ["licenses", "Software y licencias", "licenses.read"],
   ["users", "Usuarios", "users.read"],
   ["roles", "Roles y permisos", "roles.manage"],
   ["audit", "Actividades", "audit.read"],
@@ -176,6 +186,10 @@ async function renderPage() {
     current = page;
     await renderShell();
   };
+  if (current === "businesses" || current === "licenses") {
+    await (current === "businesses" ? renderBusinesses : renderLicenses)({ main, api, has, notify, heading });
+    return;
+  }
   if (current === "finance") {
     await renderFinance({ main, api, has, notify, escape, heading, openPage });
     return;
@@ -421,6 +435,8 @@ async function renderHome(main) {
     }).length;
   }
   const modules = [
+    { page: "businesses", title: "Negocios e impacto", group: "ODS 2030", tone: "sage", description: "Administra proyectos y mide su impacto económico, social y ambiental.", permission: "business.read" },
+    { page: "licenses", title: "Software y licencias", group: "Recursos digitales", tone: "blue", description: "Controla cupos, asignaciones y fechas de renovación.", permission: "licenses.read" },
     { page: "finance", title: "Finanzas", group: "Economía", tone: "sand",
       description: "Controla costos, presupuesto, ayudas y pérdidas de alimentos.", permission: "finance.read" },
     { page: "scan", title: "Escanear productos", group: "Registro con IA", tone: "peach",

@@ -1,3 +1,4 @@
+import { initializeBusiness, businessPermissions, licensePermissions } from "./business-store.mjs";
 import { initializeFinance, financePermissions } from "./finance-store.mjs";
 import { initializeLogistics, logisticsPermissions } from "./logistics.mjs";
 import {
@@ -25,6 +26,8 @@ export const permissions = [
   ...operationPermissions,
   ...logisticsPermissions,
   ...financePermissions,
+  ...businessPermissions,
+  ...licensePermissions,
 ];
 export const defaults = {
   administrador: permissions,
@@ -66,6 +69,7 @@ export function openStore(path) {
   initializeOperations(db);
   initializeLogistics(db);
   initializeFinance(db);
+  initializeBusiness(db);
   return db;
 }
 export function publicUser(user) {

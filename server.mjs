@@ -1,3 +1,5 @@
+import { handleBusinesses } from "./businesses.mjs";
+import { handleLicenses } from "./licenses.mjs";
 import { handleFinance } from "./finance.mjs";
 import { handleFinanceAI } from "./finance-ai.mjs";
 import { handleProductImports } from "./product-imports.mjs";
@@ -71,6 +73,9 @@ export async function createApp({
           "/": "index.html",
           "/app.js": "app.js",
           "/finance.js": "finance.js",
+          "/businesses.js": "businesses.js",
+          "/licenses.js": "licenses.js",
+          "/business-ui.js": "business-ui.js",
           "/product-imports.js": "product-imports.js",
           "/operations.js": "operations.js",
           "/logistics.js": "logistics.js",
@@ -283,7 +288,7 @@ export async function createApp({
         fail,
       };
       if (await handleProductImports(context, ai) || await handleFinanceAI(context, ai) ||
-          handleFinance(context) || handleOperations(context) || handleLogistics(context)) return;
+          handleBusinesses(context) || handleLicenses(context) || handleFinance(context) || handleOperations(context) || handleLogistics(context)) return;
       if (path === "/api/me" && req.method === "GET") {
         json(200, {
           user: publicUser(user),
